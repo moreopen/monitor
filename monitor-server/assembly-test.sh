@@ -1,0 +1,1 @@
+mvn -U clean assembly:assembly -Ptest -Dmaven.test.skip
