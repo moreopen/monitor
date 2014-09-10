@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.config.MonitorConfigRuleUploadPOJO">
+	<typeAlias alias="monitorConfigRuleUploadPOJO"
+		type="com.moreopen.monitor.console.dao.bean.config.MonitorConfigRuleUploadPOJO" />
+		
+	<resultMap id="monitorConfigRuleUploadPOJOResult" class="monitorConfigRuleUploadPOJO">
+
+		<result column="ID" jdbcType="Integer" property="id" />
+		<result column="uploadRuleId" jdbcType="VARCHAR" property="uploadRuleId" />
+		<result column="uploadInterval"  jdbcType="INTEGER" property="uploadInterval" />
+		
+		<result column="monitorEventId" jdbcType="VARCHAR" property="monitorEventId" />
+		<result column="monitorEventName" jdbcType="VARCHAR" property="monitorEventName" />
+		<result column="uploadRuleLogicClass" jdbcType="VARCHAR" property="uploadRuleLogicClass" />
+		
+		<result column="status" jdbcType="VARCHAR" property="status" />
+		<result column="createTime" jdbcType="Timestamp" property="createTime" />
+		<result column="updateTime" jdbcType="Timestamp" property="updateTime"/>
+		<result column="createUserId" jdbcType="VARCHAR" property="createUserId"/>
+		<result column="updateUserId" jdbcType="VARCHAR" property="updateUserId"/>
+		
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+		
+		<result column="appName" jdbcType="VARCHAR" property="appName"/>
+	</resultMap>
+	
+	<!-- 根据条件查询-->
+	<select id="selectByMap" parameterClass="java.util.Map"  resultMap="monitorConfigRuleUploadPOJOResult">
+	    
+	    select temp.*,monitor_user.user_name as updateUserName
+	     from(	
+				SELECT 
+				monitor_config_rule_upload.ID AS ID,
+				
+				upload_rule_id as uploadRuleId,
+				upload_interval as uploadInterval,
+				monitor_config_rule_upload.monitor_event_id as monitorEventId,
+				monitor_config_event.monitor_event_name as monitorEventName,
+				monitor_config_event.app_id,
+				monitor_config_app.app_name as appName,
+				upload_rule_logic_class as uploadRuleLogicClass,
+				
+				monitor_config_rule_upload.status as status,
+				monitor_config_rule_upload.create_time as createTime,
+				monitor_config_rule_upload.update_time as updateTime,
+				monitor_config_rule_upload.create_userid as createUserId,
+				monitor_config_rule_upload.update_userid as updateUserId,
+				monitor_user.user_name as createUserName,
+				
+				date_format(monitor_config_rule_upload.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+				date_format(monitor_config_rule_upload.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
+				
+				from monitor_config_rule_upload left join monitor_user
+				on monitor_config_rule_upload.create_userid=monitor_user.user_id
+				LEFT JOIN monitor_config_event
+				on monitor_config_rule_upload.monitor_event_id=monitor_config_event.monitor_event_id
+				LEFT JOIN monitor_config_app
+				ON monitor_config_event.app_id=monitor_config_app.app_id
+			)as temp left join monitor_user
+			on temp.updateUserId=monitor_user.user_id
+		<dynamic>
+		    <isNotNull prepend="where" property="eventId">
+		        temp.monitorEventId=#eventId# 
+		    </isNotNull>
+			<isNotNull property="startPostion">
+					limit #startPostion#,#pageSize#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<!--  查询总条数-->
+	<select id="count" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		SELECT COUNT(*) FROM monitor_config_rule_upload
+		<dynamic prepend="where">
+		    <isNotNull property="eventId">
+		        monitor_event_id=#eventId#
+		    </isNotNull>
+		</dynamic>
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterClass="monitorConfigRuleUploadPOJO">
+		insert into monitor_config_rule_upload
+		(
+			upload_rule_id,
+			upload_interval,
+			monitor_event_id,
+			upload_rule_logic_class,
+			status,
+			create_time,
+			create_userid,
+			update_time,
+			update_userid
+		) values(
+			#uploadRuleId#,
+			#uploadInterval#,
+			#monitorEventId#,
+			#uploadRuleLogicClass#,
+			#status#,
+			#createTime#,
+			#createUserId#,
+			#updateTime#,
+			#updateUserId#
+		)
+		 
+	</insert>
+	
+	<update id="update" parameterClass="monitorConfigRuleUploadPOJO">
+	    update monitor_config_rule_upload
+	    set
+	    upload_rule_id=#uploadRuleId#,
+	    upload_interval=#uploadInterval#,
+	    upload_rule_logic_class=#uploadRuleLogicClass#,
+	    update_time=#updateTime#,
+	    update_userid=#updateUserId#,
+	    monitor_event_id=#monitorEventId#
+	    where id=#id#
+	    
+	</update>
+	
+
+	
+	<!-- 删除 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_config_rule_upload where id=#id#	    
+	</delete>
+	
+	<!-- 删除 -->
+	<delete id="removeByEventId" parameterClass="java.lang.String">
+		delete from monitor_config_rule_upload where monitor_event_id=#monitorEventId#	    
+	</delete>
+	
+	<select id="queryListByRuleId" parameterClass="java.lang.String" resultClass="monitorConfigRuleUploadPOJO">
+	    select id
+	    from monitor_config_rule_upload
+	    where upload_rule_id=#uploadRuleId#
+	</select>
+	
+	<select id="searchByUploadId" parameterClass="java.util.Map" resultMap="monitorConfigRuleUploadPOJOResult">
+	      select temp.*,monitor_user.user_name as updateUserName
+	     from(	
+				SELECT 
+				monitor_config_rule_upload.ID AS ID,
+				
+				upload_rule_id as uploadRuleId,
+				upload_interval as uploadInterval,
+				monitor_config_rule_upload.monitor_event_id as monitorEventId,
+				monitor_config_event.monitor_event_name as monitorEventName,
+				monitor_config_event.app_id,
+				monitor_config_app.app_name as appName,
+				upload_rule_logic_class as uploadRuleLogicClass,
+				
+				monitor_config_rule_upload.status as status,
+				monitor_config_rule_upload.create_time as createTime,
+				monitor_config_rule_upload.update_time as updateTime,
+				monitor_config_rule_upload.create_userid as createUserId,
+				monitor_config_rule_upload.update_userid as updateUserId,
+				monitor_user.user_name as createUserName,
+				
+				date_format(monitor_config_rule_upload.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+				date_format(monitor_config_rule_upload.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
+				
+				from monitor_config_rule_upload 
+				left join monitor_user on monitor_config_rule_upload.create_userid=monitor_user.user_id
+				LEFT JOIN monitor_config_event
+				on monitor_config_rule_upload.monitor_event_id=monitor_config_event.monitor_event_id
+				LEFT JOIN monitor_config_app
+				ON monitor_config_event.app_id=monitor_config_app.app_id
+			)as temp left join monitor_user
+			on temp.updateUserId=monitor_user.user_id
+				<dynamic prepend="where">
+				    <isNotNull prepend="and" property="uploadId">
+				        temp.uploadRuleId like '%$uploadId$%'
+				    </isNotNull>
+				    <isNotNull prepend="and" property="eventId">
+				        temp.monitorEventId=#eventId#
+				    </isNotNull>
+				</dynamic>
+	</select>
+	
+</sqlMap>

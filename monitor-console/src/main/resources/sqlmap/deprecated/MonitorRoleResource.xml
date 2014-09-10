@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.menu.RoleResourcePOJO">
+	<typeAlias alias="resourceRolePOJO"
+		type="com.moreopen.monitor.console.dao.bean.menu.RoleResourcePOJO" />
+		
+	<resultMap id="resourceRolePOJOResult" class="resourceRolePOJO">
+
+		<result column="RESOURCE_ID" jdbcType="Integer" property="resourceId" />
+		<result column="ROLE_ID" jdbcType="Integer" property="roleId" />
+		
+		<result column="CREATE_USERID" jdbcType="Integer" property="createUserId" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+		
+		<result column="UPDATE_USERID" jdbcType="Integer" property="updateUserId" />
+		<result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+		
+		<result column="STATUS" jdbcType="Integer" property="status" />
+		<result column="RESOURCE_NAME" jdbcType="VARCHAR" property="resourceName" />
+		<result column="RESOURCE_URL" jdbcType="VARCHAR" property="resourceUrl" />
+
+	</resultMap>
+	<select id="selectByMap" parameterClass="java.util.Map" resultMap="resourceRolePOJOResult">
+		select 
+			rr.role_id as ROLE_ID,
+			rr.resource_id as RESOURCE_ID,
+			rr.create_time as CREATE_TIME,
+			rr.CREATE_USERID as CREATE_USERID,
+			rr.UPDATE_USERID as UPDATE_USERID,
+			rr.UPDATE_TIME as UPDATE_TIME,
+			r.resource_name as RESOURCE_NAME,
+			r.resource_url as RESOURCE_URL,
+			rr.status as STATUS
+		from 
+			monitor_role_resource as rr 
+		LEFT JOIN 
+			monitor_resource as r 
+		on 
+			rr.resource_id =r.resource_id
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="roleId">
+				rr.role_id=#roleId#
+			</isNotNull>
+			<isNotNull prepend="and" property="status">
+				rr.status=#status#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<!-- 删除 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_role_resource where role_id=#roleId#
+	</delete>
+	
+	<insert id="insert" parameterClass="resourceRolePOJO">
+		insert into monitor_role_resource (resource_id,role_id,create_userid,create_time,update_userid,update_time,status)
+		values(#resourceId#,#roleId#,#createUserId#,#createTime#,#updateUserId#,#updateTime#,#status#)
+	</insert>
+	
+	<!-- 逻辑删 -->
+	<update id="deleteRoleResourceByUpdate" parameterClass="java.util.Map">
+		update monitor_role_resource set status=-1 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="roleId">
+				role_id=#roleId#
+			</isNotNull>
+			<isNotNull prepend="and" property="resourceId">
+				resource_id=#resourceId#
+			</isNotNull>
+		</dynamic>
+	</update>
+	
+	<!-- 根据角色ID 和资源路径来查找 -->
+	<select id="findByRoleIdResourceUrl" parameterClass="java.util.Map" resultClass="resourceRolePOJO">
+	    select rr.*,resource_url from monitor_role_resource as rr
+		LEFT JOIN monitor_resource
+		on rr.resource_id=monitor_resource.resource_id
+		where rr.role_id=#roleId#
+		and monitor_resource.resource_url=#resourceUrl#
+	</select>
+	
+</sqlMap>

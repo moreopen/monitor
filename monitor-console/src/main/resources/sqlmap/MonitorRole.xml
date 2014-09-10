@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.menu.RolePOJO">
+	<typeAlias alias="rolePOJO"
+		type="com.moreopen.monitor.console.dao.bean.menu.RolePOJO" />
+		
+	<resultMap id="rolePOJOResult" class="rolePOJO">
+
+		<result column="ROLE_ID" jdbcType="Integer" property="roleId" />
+		<result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName" />
+		<result column="resourceNames" jdbcType="VARCHAR" property="resourceNames" />
+		
+		<result column="CREATE_USERID" jdbcType="Integer" property="createUserId" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+
+		<result column="UPDATE_USERID" jdbcType="Integer" property="updateUserId" />
+		
+		<result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+		
+		<result column="STATUS" jdbcType="Integer" property="status" />
+		
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+		
+		
+		
+	</resultMap>
+	
+	<!-- 增 -->
+	<insert id="insert" parameterClass="rolePOJO">
+		insert monitor_role(ROLE_NAME,CREATE_USERID,CREATE_TIME,STATUS,UPDATE_USERID,UPDATE_TIME)
+		values(#roleName#,#createUserId#,#createTime#,#status#,#updateUserId#,#updateTime#)
+	</insert>
+	
+	<!-- 删 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_role where ROLE_ID=#roleId#
+	</delete>
+	
+	<!-- 改 -->
+	<update id="update" parameterClass="rolePOJO">
+		update monitor_role 
+			<dynamic prepend="set">
+				<isNotNull prepend="," property="roleName">
+					ROLE_NAME=#roleName#
+				</isNotNull>
+				<isNotNull prepend="," property="status">
+					status=#status#
+				</isNotNull>
+			</dynamic>
+		where ROLE_ID=#roleId#
+	</update>
+	
+	<!-- 查-->
+	<select id="selectByMap" parameterClass="java.util.Map" resultMap="rolePOJOResult">
+		select temp.*,monitor_user.user_name as updateUserName
+		from(	
+		  	SELECT 
+				monitor_role.ROLE_ID as ROLE_ID,
+				monitor_role.ROLE_NAME as ROLE_NAME,
+				monitor_role.CREATE_USERID as CREATE_USERID,
+				monitor_role.CREATE_TIME as CREATE_TIME,
+				monitor_role.UPDATE_USERID as UPDATE_USERID,
+				monitor_role.UPDATE_TIME as UPDATE_TIME,
+				monitor_role.STATUS as STATUS,
+				GROUP_CONCAT(t.RESOURCE_NAME) as resourceNames,
+				monitor_user.user_name as createUserName,
+				date_format(monitor_role.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+				date_format(monitor_role.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
+			FROM monitor_role 
+			LEFT JOIN
+				(
+					select monitor_role_resource.resource_id,monitor_role_resource.role_id,monitor_resource.resource_name 
+					from monitor_role_resource,monitor_resource 
+					where monitor_role_resource.resource_id=monitor_resource.resource_id 
+				) as t
+			on monitor_role.role_id =t.role_id 
+			left join monitor_user
+			on monitor_role.CREATE_USERID=monitor_user.user_id
+				GROUP BY role_id
+		)as temp left join monitor_user
+		on temp.UPDATE_USERID=monitor_user.user_id
+		
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="roleName">
+				temp.ROLE_NAME like '%$roleName$%'
+			</isNotNull>
+			<isNotNull prepend="and" property="status">
+				temp.status= #status#
+			</isNotNull>
+		</dynamic>
+		
+		<dynamic prepend="limit">
+			<isNotNull property="startPostion">
+				#startPostion#,#pageSize#
+			</isNotNull>
+		</dynamic>
+		
+	</select>
+	
+	<!-- 查询所有的角色 -->
+	<select id="queryAllRole" parameterClass="java.util.Map" resultClass="rolePOJO">
+		SELECT 
+		ROLE_ID as roleId,
+		ROLE_NAME as roleName,
+		CREATE_USERID as createUserId,
+		CREATE_TIME as createTime,
+		UPDATE_USERID as updateUserId,
+		UPDATE_TIME as updateTime,
+		STATUS as status
+		
+		FROM monitor_role 
+		
+		<dynamic prepend="where">
+			<isNotNull  property="status">
+				status=#status#
+			</isNotNull>
+		</dynamic>
+		
+		<dynamic prepend="limit">
+			<isNotNull property="startPostion">
+				#startPostion#,#pageSize#
+			</isNotNull>
+		</dynamic>
+		
+	</select>
+	
+	<!-- 总条数 -->
+	<select id="count" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		select count(*) from monitor_role
+		<dynamic prepend="where">
+			<isNotNull prepend="," property="status">
+				status=#status#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	
+	 
+	
+</sqlMap>

@@ -1,0 +1,42 @@
+package com.moreopen.monitor.console.controller;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.meidusa.venus.io.serializer.json.JsonSerializer;
+import com.moreopen.monitor.console.constant.MonitorConstant;
+
+public class BaseController {
+	
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	@Autowired
+	protected JsonSerializer jsonSerializer;
+	
+	/**
+	 * 将结果输出到客户端
+	 * @param response
+	 * @param result
+	 * @throws IOException
+	 */
+	protected void outputResult2Client(HttpServletResponse response, String result) throws IOException {
+		response.setContentType("text/html;charset=UTF-8"); 
+		response.getWriter().print(result);
+	}
+	
+	/**
+	 * 将结果输出到客户端
+	 * @param response
+	 * @param result
+	 * @throws IOException
+	 */
+	protected void outputResult2Client(HttpServletResponse response, byte[] bytes) throws IOException {
+		outputResult2Client(response, new String(bytes, MonitorConstant.encodeUTF8));
+	}
+	
+}

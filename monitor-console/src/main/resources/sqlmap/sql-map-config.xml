@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings useStatementNamespaces="true"/>
+	
+	<!-- 权限相关 bean 的xml文件 -->
+	<sqlMap resource="sqlmap/MonitorMenu.xml"/>
+	<sqlMap resource="sqlmap/MonitorUser.xml"/>
+	<sqlMap resource="sqlmap/MonitorRole.xml"/>
+	<sqlMap resource="sqlmap/MonitorUserRole.xml"/>
+	
+	<!--sqlMap resource="sqlmap/MonitorRoleResource.xml"/-->
+	<!-- 监控 相关 bean 的xml文件 -->
+	<!--sqlMap resource="sqlmap/MonitorDataEvent.xml"/-->
+	<!--sqlMap resource="sqlmap/MonitorDataRisk.xml"/-->
+	<!--sqlMap resource="sqlmap/MonitorConfigIpPort.xml"/-->
+	<!--sqlMap resource="sqlmap/MonitorConfigRuleAlarm.xml"/>
+	<sqlMap resource="sqlmap/MonitorConfigRuleMonitor.xml"/>
+	<sqlMap resource="sqlmap/MonitorConfigRuleUpload.xml"/-->
+	
+</sqlMapConfig>

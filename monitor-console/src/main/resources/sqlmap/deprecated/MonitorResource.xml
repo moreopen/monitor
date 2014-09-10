@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.menu.ResourcePOJO">
+	<typeAlias alias="resourcePOJO"
+		type="com.moreopen.monitor.console.dao.bean.menu.ResourcePOJO" />
+		
+	<resultMap id="resourcePOJOResult" class="resourcePOJO">
+
+		<result column="RESOURCE_ID" jdbcType="Integer" property="resourceId" />
+		<result column="RESOURCE_NAME" jdbcType="VARCHAR" property="resourceName" />
+		<result column="RESOURCE_URL" jdbcType="VARCHAR" property="resourceUrl" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="CREATE_USERID" jdbcType="Integer" property="createUserId" />
+		<result column="UPDATE_USERID" jdbcType="Integer" property="updateUserId" />
+		<result column="STATUS" jdbcType="Integer" property="status" />
+		<result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+
+	</resultMap>
+	
+	<!-- 根据页码和每页的条数来查询-->
+	<select id="getListByPageRows" parameterClass="java.util.Map"  resultMap="resourcePOJOResult">
+			select temp.*,monitor_user.user_name as updateUserName
+	    	from(	
+		    	select 
+				RESOURCE_ID,RESOURCE_NAME,RESOURCE_URL,
+				monitor_resource.CREATE_TIME,
+				monitor_resource.CREATE_USERID,
+				monitor_resource.UPDATE_USERID,
+				monitor_resource.STATUS,
+				monitor_resource.UPDATE_TIME,
+				monitor_user.user_name as createUserName,
+				date_format(monitor_resource.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+				date_format(monitor_resource.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
+				from monitor_resource left join monitor_user
+				on monitor_resource.CREATE_USERID=monitor_user.user_id
+			)as temp left join monitor_user
+			on temp.UPDATE_USERID=monitor_user.user_id
+			
+		<dynamic>
+				<isNotNull prepend="where" property="status">
+						temp.status=#status#
+				</isNotNull>
+		</dynamic>
+		ORDER BY temp.update_time desc
+		limit #startPostion#,#pageSize#
+	</select>
+	
+	<!-- 查询资源的总条数 -->
+	<select id="count" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(*) from monitor_resource
+		<dynamic prepend="where">
+				<isNotNull prepend="and" property="status">
+						status=#status#
+				</isNotNull>
+		</dynamic>
+	</select>
+	
+	<!-- 插入记录 -->
+	<insert id="insertResource" parameterClass="resourcePOJO">
+		insert monitor_resource(RESOURCE_NAME,RESOURCE_URL,CREATE_TIME,CREATE_USERID,UPDATE_TIME,UPDATE_USERID,STATUS)
+		values(#resourceName#,#resourceUrl#,#createTime#,#createUserId#,#updateTime#,#updateUserId#,#status#)
+		<selectKey resultClass="int" keyProperty="resourceId">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<!-- 更新记录 -->
+	<update id="update" parameterClass="resourcePOJO">
+		update monitor_resource
+		 
+		<dynamic prepend="set">
+		    <isNotNull prepend="," property="resourceName">
+		        RESOURCE_NAME=#resourceName#
+		    </isNotNull>
+		    <isNotNull prepend="," property="resourceUrl">
+		        RESOURCE_URL=#resourceUrl#
+		    </isNotNull>
+		    <isNotNull prepend="," property="updateTime">
+		        UPDATE_TIME=#updateTime#
+		    </isNotNull>
+		    <isNotNull prepend="," property="updateUserId">
+		       UPDATE_USERID=#updateUserId#
+		    </isNotNull>
+		    <isNotNull prepend="," property="status">
+		       STATUS=#status#
+		    </isNotNull>
+		</dynamic>
+		where RESOURCE_ID=#resourceId#
+	</update>
+	
+	<!-- 根据resourceId 查询 -->
+	<select id="findByResourceId" parameterClass="java.lang.Integer" resultClass="resourcePOJO">
+		select 
+		RESOURCE_ID as resourceId,
+		RESOURCE_NAME as resourceName,
+		RESOURCE_URL as resourceUrl,
+		CREATE_TIME as createTime,
+		CREATE_USERID as createUserId,
+		UPDATE_USERID as updateUserId,
+		STATUS as status,
+		UPDATE_TIME as updateTime 
+		from monitor_resource 
+		where RESOURCE_ID=#resourceId#
+	</select>
+	
+	<!-- 删除记录 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_resource where RESOURCE_ID=#resourceId#
+	</delete>
+	
+	<select id="searchByResouceName" parameterClass="java.lang.String" resultMap="resourcePOJOResult">
+	    select temp.*,monitor_user.user_name as updateUserName
+	    	from(	
+		    	select 
+				RESOURCE_ID,
+				RESOURCE_NAME,RESOURCE_URL,
+				monitor_resource.CREATE_TIME,
+				monitor_resource.CREATE_USERID,
+				monitor_resource.UPDATE_USERID,
+				monitor_resource.STATUS,
+				monitor_resource.UPDATE_TIME,
+				monitor_user.user_name as createUserName,
+				date_format(monitor_resource.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+				date_format(monitor_resource.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
+				from monitor_resource left join monitor_user
+				on monitor_resource.CREATE_USERID=monitor_user.user_id 
+				where (RESOURCE_NAME like '%$resourceName$%')
+			)as temp left join monitor_user
+			on temp.UPDATE_USERID=monitor_user.user_id
+	</select>
+	
+</sqlMap>

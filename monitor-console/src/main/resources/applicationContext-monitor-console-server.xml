@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:p="http://www.springframework.org/schema/p"
+	default-autowire="byName">
+	<context:annotation-config />
+	<context:component-scan base-package="com.moreopen.monitor.console" />
+	<context:mbean-export registration="failOnExisting" />
+	<import resource="classpath:/applicationContext-monitor-console-dal.xml" />
+
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:monitor.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<!-- json序列号相关 bean -->
+	<bean id="jsonSerializer" class="com.meidusa.venus.io.serializer.json.JsonSerializer" />
+
+	<!-- 菜单相关bean -->
+	<bean id="menuServiceImpl" class="com.moreopen.monitor.console.biz.menu.MenuServiceImpl" />
+	<bean id="userServiceImpl" class="com.moreopen.monitor.console.biz.menu.UserServiceImpl" />
+	<bean id="roleServiceImpl" class="com.moreopen.monitor.console.biz.menu.RoleServiceImpl" />
+	<bean id="userRoleServiceImpl" class="com.moreopen.monitor.console.biz.menu.UserRoleServiceImpl" />
+	
+	<!-- 监控 bean -->
+	<bean id="monitorDataEventServiceImpl" class="com.moreopen.monitor.console.biz.monitor.MonitorDataEventServiceImpl" />
+	<bean id="monitorHostServiceImpl" class="com.moreopen.monitor.console.biz.monitor.MonitorHostServiceImpl"></bean>
+	
+</beans>

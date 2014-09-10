@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.menu.MenuPOJO">
+	<typeAlias alias="menuPOJO"
+		type="com.moreopen.monitor.console.dao.bean.menu.MenuPOJO" />
+		
+	<resultMap id="menuPOJOResult" class="menuPOJO">
+		<result column="MENU_NAME" jdbcType="VARCHAR" property="menuName" />
+		<result column="MENU_POSITION" jdbcType="Integer" property="menuPosition" />
+		<result column="MENU_FLOOR" jdbcType="Integer" property="menuFloor" />
+		<result column="MENU_PID" jdbcType="Integer" property="menuPid" />
+		<result column="MENU_ISLEAF" jdbcType="Integer" property="menuIsleaf" />
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+		
+		<result column="MENU_CODE" jdbcType="VARCHAR" property="menuCode"/>
+		<result column="CHILDREN_SIZE" jdbcType="Integer" property="childrenSize"/>
+		
+		<result column="id" jdbcType="Integer" property="id"/>
+
+	</resultMap>
+	
+	<!-- 根据条件查询菜单 -->
+	<select id="selectByMap"  parameterClass="java.util.Map" resultMap="menuPOJOResult">
+	 select temp.*,monitor_user.user_name as updateUserName
+	    from(	
+		SELECT 
+			m.id as id,
+			m.MENU_NAME as MENU_NAME,
+			m.MENU_POSITION as MENU_POSITION ,
+			m.MENU_PID as MENU_PID,
+			m.MENU_FLOOR as MENU_FLOOR,
+			m.MENU_ISLEAF as MENU_ISLEAF,
+			m.CREATE_USERID as CREATE_USERID,
+			m.CREATE_TIME as CREATE_TIME,
+			m.UPDATE_USERID as UPDATE_USERID,
+			m.UPDATE_TIME as UPDATE_TIME,
+			m.STATUS as STATUS,
+			monitor_user.user_name as createUserName,
+			date_format(m.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+			date_format(m.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat,
+			m.MENU_CODE as MENU_CODE,
+			m.CHILDREN_SIZE as CHILDREN_SIZE
+		FROM monitor_menu AS m
+		LEFT JOIN monitor_user
+		ON m.CREATE_USERID=monitor_user.user_id
+		)as temp left join monitor_user
+		
+		on temp.UPDATE_USERID=monitor_user.user_id
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="menuPid">
+					temp.menu_pid=#menuPid#
+			</isNotNull>
+			<isNotNull prepend="and" property="status">
+					temp.status=#status#
+			</isNotNull>
+			<isNotNull prepend="and" property="menuCode">
+					temp.menu_code=#menuCode#
+			</isNotNull>
+		</dynamic>
+		<dynamic prepend="limit">
+			<isNotNull prepend="," property="startPostion">
+				#startPostion#,#pageSize#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<!-- 增加菜单 -->
+	<insert id="insertMenu" parameterClass="menuPOJO">
+		insert monitor_menu(MENU_NAME,MENU_POSITION,MENU_FLOOR,MENU_ISLEAF,MENU_PID,CREATE_USERID,CREATE_TIME,UPDATE_USERID,UPDATE_TIME,MENU_CODE,CHILDREN_SIZE)
+		values(#id#,#menuName#,#menuPosition#,#menuFloor#,#menuIsleaf#,#menuPid#,#createUserid#,#createTime#,#updateUserid#,#updateTime#,#menuCode#,#childrenSize#)
+		<!-- 
+			<selectKey resultClass="int" keyProperty="menuId">
+				SELECT LAST_INSERT_ID()
+			</selectKey>
+		 -->
+	</insert>
+	
+	<!-- 查询最大的menuID -->
+	<select id="selectMaxMenuId" resultClass="java.lang.Integer">
+		select max(id) as MAX_MENU_ID from monitor_menu
+	</select>
+	
+	<!-- 通过menu_id去查询-->
+	<select id="selectByMenuId" parameterClass="java.lang.Integer" resultClass="menuPOJO">
+		SELECT id as id,MENU_NAME as menuName,MENU_POSITION as menuPosition,MENU_FLOOR as menuFloor,MENU_ISLEAF as menuIsleaf,MENU_PID as menuPid
+			,CREATE_USERID as createUserid,CREATE_TIME as createTime,UPDATE_USERID as updateUserid,UPDATE_TIME as updateTime,STATUS as status,MENU_CODE as menuCode,CHILDREN_SIZE as childrenSize 
+		FROM monitor_menu
+		WHERE id=#id#
+	</select>
+	 
+	
+	<!-- 查询某一级菜单的子菜单的位置最大数 -->
+	<select id="selectMaxMenuPosition" parameterClass="java.lang.Integer" resultClass="java.lang.Integer">
+		select max(menu_position)
+		from monitor_menu 
+		where menu_pid=#id#
+	</select>
+	
+	<!-- 直接删除 -->
+	<delete id="delete" parameterClass="menuPOJO">
+	    delete from monitor_menu where id=#id#
+	</delete>
+	
+	<!-- 更新菜单 -->
+	<update id="update" parameterClass="menuPOJO">
+		update monitor_menu 
+			<dynamic prepend="set">
+				<isNotNull prepend="," property="menuIsleaf">
+					MENU_ISLEAF=#menuIsleaf#
+				</isNotNull>
+				<isNotNull  prepend="," property="menuName">
+					MENU_NAME=#menuName#
+				</isNotNull>
+				<isNotNull  prepend="," property="status">
+					status=#status#
+				</isNotNull>
+				<isNotNull  prepend="," property="childrenSize">
+					CHILDREN_SIZE=#childrenSize#
+				</isNotNull>
+			</dynamic>
+		where id=#id#
+	</update>
+	
+	<!-- 查询1级菜单的总数 -->
+	<select id="count" resultClass="java.lang.Integer">
+		select count(*) from monitor_menu  where monitor_menu.menu_Pid=1
+	</select>
+	
+</sqlMap>

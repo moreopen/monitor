@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.monitor.MonitorDataEventPOJO">
+	<typeAlias alias="monitorDataEventPOJO"
+		type="com.moreopen.monitor.console.dao.bean.monitor.MonitorDataEventPOJO" />
+		
+	<resultMap id="pojoResultMap" class="monitorDataEventPOJO">
+		<result column="ID" jdbcType="Integer" property="id" />
+		<result column="FIGURE" jdbcType="Integer" property="figure" />
+		<result column="IPPORT" jdbcType="VARCHAR" property="ipport" />
+		<result column="EVENT_CREATE_TIME" jdbcType="Timestamp" property="eventCreateTime"/>
+		<result column="DAY" jdbcType="VARCHAR" property="day" />
+		<result column="TIME" jdbcType="VARCHAR" property="time" />
+		<result column="CREATE_TIME" jdbcType="Timestamp" property="createTime" />
+	</resultMap>
+	
+	<select id="selectByMap" parameterClass="java.util.Map" resultMap="pojoResultMap">
+		select 
+			ID,
+			MONITOR_EVENT_ID,
+			MONITOR_EVENT_ITEM_ID,
+			MONITOR_EVENT_ITEM_NAME,
+			date_format(EVENT_CREATE_TIME,'%Y-%m-%d %T') as CREATE_TIME,
+			date_format(EVENT_CREATE_TIME,'%Y-%m-%d') as DAY,
+			date_format(EVENT_CREATE_TIME,'%T') as TIME,
+			FIGURE,
+			UNIT,
+			IPPORT,
+			EVENT_CREATE_TIME as EVENT_CREATE_TIME
+		from
+			monitor_data_event
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="eventId">
+				MONITOR_EVENT_ID=#eventId#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="itemId">
+				MONITOR_EVENT_ITEM_ID=#itemId#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="eventCreateTime">
+				EVENT_CREATE_TIME>#eventCreateTime#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="ip">
+				IPPORT=#ip#
+			</isNotNull>
+			
+		</dynamic>
+		order by EVENT_CREATE_TIME 
+	</select>
+	
+	<!-- 获取总条数 -->
+	<select id="count" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(*) from monitor_data_event
+		where 
+			<![CDATA[ 
+				EVENT_CREATE_TIME>=#beginTime# and EVENT_CREATE_TIME<=#endTime# and MONITOR_EVENT_ITEM_ID=#itemId#
+			 ]]> 
+		
+	</select>
+	<!-- 根据分页获取数据 -->
+	<select id="getOneDayEventIdItemIdDataByPage" parameterClass="java.util.Map" resultMap="pojoResultMap">
+		select 
+			ID,
+			MONITOR_EVENT_ID,
+			MONITOR_EVENT_ITEM_ID,
+			MONITOR_EVENT_ITEM_NAME,
+			date_format(EVENT_CREATE_TIME,'%Y-%m-%d %T') as CREATE_TIME,
+			date_format(EVENT_CREATE_TIME,'%Y-%m-%d') as DAY,
+			date_format(EVENT_CREATE_TIME,'%T') as TIME,
+			FIGURE,
+			UNIT,
+			IPPORT,
+			EVENT_CREATE_TIME as EVENT_CREATE_TIME
+		from
+			monitor_data_event
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="eventId">
+				MONITOR_EVENT_ID=#eventId#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="itemId">
+				MONITOR_EVENT_ITEM_ID=#itemId#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="startMillionSeconds">
+				<![CDATA[ 
+					EVENT_CREATE_TIME>=#startMillionSeconds#
+				 ]]> 
+			</isNotNull>
+		</dynamic>
+		order by EVENT_CREATE_TIME
+		limit #beginPosition#,#endPosition# 
+		 
+	</select>
+	<!-- 根据 -->
+	<select id="getOneDayDataByEventIdItemIdDate" parameterClass="java.util.Map" resultMap="pojoResultMap">
+		select 
+			ID,
+			MONITOR_EVENT_ID,
+			MONITOR_EVENT_ITEM_ID,
+			MONITOR_EVENT_ITEM_NAME,
+			date_format(EVENT_CREATE_TIME,'%Y-%m-%d %T') as CREATE_TIME,
+			date_format(EVENT_CREATE_TIME,'%Y-%m-%d') as DAY,
+			date_format(EVENT_CREATE_TIME,'%T') as TIME,
+			FIGURE,
+			UNIT,
+			IPPORT,
+			EVENT_CREATE_TIME as EVENT_CREATE_TIME
+		from
+			monitor_data_event
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="eventId">
+				MONITOR_EVENT_ID=#eventId#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="itemId">
+				MONITOR_EVENT_ITEM_ID=#itemId#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="ip">
+				ipport=#ip#
+			</isNotNull>
+			
+			<isNotNull prepend="and" property="startMillionSeconds">
+				<![CDATA[ 
+					EVENT_CREATE_TIME>=#startMillionSeconds# and EVENT_CREATE_TIME<=#endMillionSeconds#
+				 ]]> 
+			</isNotNull>
+		</dynamic>
+		order by EVENT_CREATE_TIME
+	</select>
+	
+</sqlMap>

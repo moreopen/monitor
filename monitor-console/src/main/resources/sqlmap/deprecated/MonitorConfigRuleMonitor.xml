@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.config.MonitorConfigRuleMonitorPOJO">
+	<typeAlias alias="monitorConfigRuleMonitorPOJO"
+		type="com.moreopen.monitor.console.dao.bean.config.MonitorConfigRuleMonitorPOJO" />
+		
+	<resultMap id="monitorConfigRuleMonitorPOJOResult" class="monitorConfigRuleMonitorPOJO">
+
+		<result column="ID" jdbcType="Integer" property="id" />
+		<result column="monitorRuleId" jdbcType="VARCHAR" property="monitorRuleId" />
+		<result column="monitorRuleName" jdbcType="VARCHAR" property="monitorRuleName"/>
+		<result column="monitorEventId" jdbcType="VARCHAR" property="monitorEventId" />
+		<result column="monitorEventName" jdbcType="VARCHAR" property="monitorEventName" />
+		<result column="appName" jdbcType="VARCHAR" property="appName" />
+		<result column="monitorEventItemName" jdbcType="VARCHAR" property="monitorEventItemName" />
+		<result column="monitorEventItemId" jdbcType="VARCHAR" property="monitorEventItemId" />
+		<result column="monitorRuleCondition" jdbcType="VARCHAR" property="monitorRuleCondition" />
+		<result column="monitorRuleConditionSymbol" jdbcType="VARCHAR" property="monitorRuleConditionSymbol" />
+		<result column="monitorRuleThreshold"  jdbcType="LONG" property="monitorRuleThreshold" />
+		<result column="monitorRuleThresholdUnit" jdbcType="VARCHAR" property="monitorRuleThresholdUnit" />
+		<result column="monitorType"  jdbcType="INTEGER" property="monitorType" />
+
+		<result column="monitorTypeString"  jdbcType="VARCHAR" property="monitorTypeString" />
+		
+		<result column="monitorBeginTime"  jdbcType="STRING"  property="monitorBeginTime" />
+		<result column="monitorEndTime" jdbcType="VARCHAR" property="monitorEndTime" />
+		
+		<result column="monitorRisk"  jdbcType="INTEGER" property="monitorRisk" />
+		<result column="monitorPriority"  jdbcType="INTEGER" property="monitorPriority" />
+		
+		<result column="status" jdbcType="VARCHAR" property="status" />
+		<result column="createTime" jdbcType="Timestamp" property="createTime" />
+		<result column="updateTime" jdbcType="Timestamp" property="updateTime"/>
+		<result column="createUserId" jdbcType="VARCHAR" property="createUserId"/>
+		<result column="updateUserId" jdbcType="VARCHAR" property="updateUserId"/>
+		
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+	</resultMap>
+	
+	<!-- 根据条件查询-->
+	<select id="selectByMap" parameterClass="java.util.Map"  resultMap="monitorConfigRuleMonitorPOJOResult">
+			
+	   select result.*,monitor_config_app.app_name as appName
+from(
+select temp.*,monitor_user.user_name as updateUserName,monitor_config_event.monitor_event_name as monitorEventName,
+monitor_config_event.app_id ,
+monitor_config_event_item.monitor_event_item_name as  monitorEventItemName
+	     from(	
+	    SELECT 
+			monitor_config_rule_monitor.ID AS ID,
+			
+			monitor_rule_id as monitorRuleId,
+			monitor_rule_name as monitorRuleName,
+			monitor_event_id as monitorEventId,
+			monitor_event_item_id as monitorEventItemId,
+			monitor_rule_condition as monitorRuleCondition,
+			
+			case monitor_rule_condition
+			 when 'lt' then '&lt;'
+			 when 'gt' then '&gt;'
+			 when 'eq' then '='
+			end as monitorRuleConditionSymbol,
+			
+			
+			monitor_rule_threshold as monitorRuleThreshold,
+			monitor_rule_threshold_unit as monitorRuleThresholdUnit,
+		
+			monitor_type as monitorType,
+			
+			case monitor_type
+			when '1' then '简单事件'
+			when '2' then '复杂事件'
+			end as monitorTypeString,
+			
+			monitor_begin_time as monitorBeginTime,
+			monitor_end_time as monitorEndTime,
+			monitor_risk as monitorRisk,
+			monitor_priority as monitorPriority,
+			
+			monitor_config_rule_monitor.status as status,
+			monitor_config_rule_monitor.create_time as createTime,
+			monitor_config_rule_monitor.update_time as updateTime,
+			monitor_config_rule_monitor.create_userid as createUserId,
+			monitor_config_rule_monitor.update_userid as updateUserId ,
+			monitor_user.user_name as createUserName,
+			
+			date_format(monitor_config_rule_monitor.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+			date_format(monitor_config_rule_monitor.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
+			
+			from monitor_config_rule_monitor left join monitor_user
+			
+			on   monitor_config_rule_monitor.create_userid=monitor_user.user_id
+			)as temp left join monitor_user 
+			on temp.UPDATEUSERID=monitor_user.user_id  
+		    left join monitor_config_event 
+			on temp.monitorEventId=monitor_config_event.monitor_event_id
+			LEFT JOIN monitor_config_event_item
+			on temp.monitorEventItemId=monitor_config_event_item.monitor_event_item_id
+)as result 
+
+left JOIN monitor_config_app
+on result.app_id=monitor_config_app.app_id
+			
+			
+			<dynamic prepend="where">
+			    <isNotNull property="eventId" prepend="and">
+			        monitorEventId=#eventId#
+			    </isNotNull>
+			    <isNotNull property="itemId" prepend="and">
+			        monitorEventItemId=#itemId#
+			    </isNotNull>
+			</dynamic>
+			
+			<dynamic>
+				<isNotNull property="startPostion">
+						limit #startPostion#,#pageSize#
+				</isNotNull>
+			</dynamic>
+	</select>
+	
+	<!--  查询总条数-->
+	<select id="count" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		SELECT COUNT(*) FROM monitor_config_rule_monitor
+		<dynamic prepend="where">
+		    <isNotNull prepend="and" property="eventId">
+		        monitor_event_id=#eventId#
+		    </isNotNull>
+		     <isNotNull prepend="and" property="itemId">
+		        monitor_event_item_id=#itemId#
+		    </isNotNull>
+		</dynamic>
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insert" parameterClass="monitorConfigRuleMonitorPOJO">
+		insert into monitor_config_rule_monitor
+		(
+			monitor_rule_id,                
+			monitor_event_id,               
+			monitor_event_item_id,          
+			monitor_rule_condition ,        
+			monitor_rule_threshold ,        
+			monitor_rule_threshold_unit  ,  
+		                
+			monitor_type ,                  
+			monitor_begin_time ,            
+			monitor_end_time   ,            
+			monitor_risk,                   
+			monitor_priority,               
+			
+			status,                         
+			create_time,                    
+			create_userid,
+			update_time,
+			update_userid,
+			monitor_rule_name
+			               
+		) values(
+			#monitorRuleId#,
+			#monitorEventId#,
+			#monitorEventItemId#,
+			#monitorRuleCondition#,
+			#monitorRuleThreshold#,
+			#monitorRuleThresholdUnit#,
+		
+			#monitorType#,
+			#monitorBeginTime#,
+			#monitorEndTime#,
+			#monitorRisk#,
+			#monitorPriority#,
+			#status#,
+			#createTime#,
+			#createUserId#,
+			#updateTime#,
+			#updateUserId#,
+			#monitorRuleName#
+		)
+	</insert>
+	
+	<!-- 更新 -->
+	<update id="update" parameterClass="monitorConfigRuleMonitorPOJO">
+		update monitor_config_rule_monitor
+		<dynamic prepend="set">
+		    <isNotNull prepend="," property="monitorRuleId">
+		        monitor_rule_id=#monitorRuleId#
+		    </isNotNull>
+		    
+		    <isNotNull prepend="," property="monitorRuleCondition">
+		        monitor_rule_condition=#monitorRuleCondition#
+		    </isNotNull>
+		    <isNotNull prepend="," property="monitorRuleThreshold">
+		        monitor_rule_threshold=#monitorRuleThreshold#
+		    </isNotNull>
+		    <isNotNull prepend="," property="monitorRuleThresholdUnit">
+		        monitor_rule_threshold_unit=#monitorRuleThresholdUnit#
+		    </isNotNull>
+		   
+		    <isNotNull prepend="," property="monitorType">
+		        monitor_type=#monitorType#
+		    </isNotNull>
+		    <isNotNull prepend="," property="monitorBeginTime">
+		        monitor_begin_time=#monitorBeginTime#
+		    </isNotNull>
+		    <isNotNull prepend="," property="monitorEndTime">
+		        monitor_end_time=#monitorEndTime#
+		    </isNotNull>
+		    <isNotNull prepend="," property="monitorRisk">
+		        monitor_risk=#monitorRisk#
+		    </isNotNull>
+		    <isNotNull prepend="," property="monitorPriority">
+		        monitor_priority=#monitorPriority#
+		    </isNotNull>
+	     	<isNotNull prepend="," property="status">
+	        	status=#status#
+	    	</isNotNull>
+	    	<isNotNull prepend="," property="updateTime">
+	        	update_time=#updateTime#
+	    	</isNotNull>
+	    	<isNotNull prepend="," property="updateUserId">
+	        	update_userid=#updateUserId#
+	    	</isNotNull>
+	    	<isNotNull prepend="," property="monitorRuleName">
+	        	monitor_rule_name=#monitorRuleName#
+	    	</isNotNull>
+	    	<isNotNull prepend="," property="monitorEventItemId">
+	        	monitor_event_item_id=#monitorEventItemId#
+	    	</isNotNull>
+	    	where id=#id#
+		</dynamic>    
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_config_rule_monitor where id=#id#	    
+	</delete>
+	
+	<!-- 根据EventId删除 -->
+	<delete id="removeByEventId" parameterClass="java.lang.String">
+		delete from monitor_config_rule_monitor where monitor_event_id=#monitorEventId# 
+	</delete>
+	
+	<!-- 根据 Item Id 删除 -->
+	<delete id="removeByItemId" parameterClass="java.lang.String">
+		delete from monitor_config_rule_monitor where monitor_event_item_id=#monitorEventItemId# 
+	</delete>
+	
+	<select id="queryForListByRuleId" parameterClass="java.lang.String" resultClass="monitorConfigRuleMonitorPOJO">
+	    select id
+	    from monitor_config_rule_monitor
+	    where monitor_rule_id=#monitorRuleId#
+	</select>
+	
+	<!-- 根据规则名称搜索 -->
+	<select id="searchByRuleName" parameterClass="java.util.Map" resultMap="monitorConfigRuleMonitorPOJOResult">
+		
+	      select result.*,monitor_config_app.app_name as appName
+from(
+select temp.*,monitor_user.user_name as updateUserName,monitor_config_event.monitor_event_name as monitorEventName,
+monitor_config_event.app_id ,
+monitor_config_event_item.monitor_event_item_name as  monitorEventItemName
+	     from(	
+	    SELECT 
+			monitor_config_rule_monitor.ID AS ID,
+			
+			monitor_rule_id as monitorRuleId,
+			monitor_rule_name as monitorRuleName,
+			monitor_event_id as monitorEventId,
+			monitor_event_item_id as monitorEventItemId,
+			monitor_rule_condition as monitorRuleCondition,
+			
+			case monitor_rule_condition
+			 when 'lt' then '&lt;'
+			 when 'gt' then '&gt;'
+			 when 'eq' then '='
+			end as monitorRuleConditionSymbol,
+			
+			
+			monitor_rule_threshold as monitorRuleThreshold,
+			monitor_rule_threshold_unit as monitorRuleThresholdUnit,
+		
+			monitor_type as monitorType,
+			
+			case monitor_type
+			when '1' then '简单事件'
+			when '2' then '复杂事件'
+			end as monitorTypeString,
+			
+			monitor_begin_time as monitorBeginTime,
+			monitor_end_time as monitorEndTime,
+			monitor_risk as monitorRisk,
+			monitor_priority as monitorPriority,
+			
+			monitor_config_rule_monitor.status as status,
+			monitor_config_rule_monitor.create_time as createTime,
+			monitor_config_rule_monitor.update_time as updateTime,
+			monitor_config_rule_monitor.create_userid as createUserId,
+			monitor_config_rule_monitor.update_userid as updateUserId ,
+			monitor_user.user_name as createUserName,
+			
+			date_format(monitor_config_rule_monitor.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+			date_format(monitor_config_rule_monitor.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
+			
+			from monitor_config_rule_monitor left join monitor_user
+			
+			on   monitor_config_rule_monitor.create_userid=monitor_user.user_id
+			)as temp left join monitor_user 
+			on temp.UPDATEUSERID=monitor_user.user_id  
+		    left join monitor_config_event 
+			on temp.monitorEventId=monitor_config_event.monitor_event_id
+			LEFT JOIN monitor_config_event_item
+			on temp.monitorEventItemId=monitor_config_event_item.monitor_event_item_id
+)as result 
+
+left JOIN monitor_config_app
+on result.app_id=monitor_config_app.app_id	 
+			<dynamic prepend="where">
+			    <isNotNull prepend="and" property="ruleName">
+			        result.monitorRuleName like '%$ruleName$%'
+			    </isNotNull>
+			    <isNotNull prepend="and" property="ruleId">
+			        result.monitorRuleId like '%$ruleId$%'
+			    </isNotNull>
+			    <isNotNull prepend="and" property="item">
+			        result.monitorEventItemId=#item#
+			    </isNotNull>
+			</dynamic>
+	</select>
+	
+</sqlMap>

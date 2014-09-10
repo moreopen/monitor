@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.menu.UserRolePOJO">
+	<typeAlias alias="userRolePOJO"
+		type="com.moreopen.monitor.console.dao.bean.menu.UserRolePOJO" />
+		
+	<resultMap id="userRolePOJOResult" class="userRolePOJO">
+
+		<result column="USER_ROLE_ID" jdbcType="VARCHAR" property="userRoleId" />
+		<result column="USER_ID" jdbcType="Integer" property="userId" />
+		<result column="ROLE_ID" jdbcType="Integer" property="roleId" />
+		
+		<result column="CREATE_USERID" jdbcType="Integer" property="createUserId" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+
+		<result column="UPDATE_USERID" jdbcType="Integer" property="updateUserId" />
+		
+		<result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+		
+		<result column="STATUS" jdbcType="Integer" property="status" />
+		<result column="ROLE_NAME" jdbcType="VARCHAR" property="roleName" />
+		<result column="ROLE_NAMES" jdbcType="VARCHAR" property="roleNames" />
+		
+		
+	</resultMap>
+	
+	<!-- 增-->
+	<insert id="insert" parameterClass="userRolePOJO">
+		insert monitor_user_role(USER_ID,ROLE_ID,CREATE_USERID,CREATE_TIME,STATUS)
+		values(#userId#,#roleId#,#createUserId#,#createTime#,#status#)
+	</insert>
+	
+	<!-- 删 -->
+	<delete id="delete" parameterClass="java.lang.Integer">
+		delete from monitor_user_role where ROLE_ID=#roleId#
+	</delete>
+	
+	<!-- 根据用户ID删 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_user_role where user_id=#userId#;
+	</delete>
+	
+	
+	<!-- 查-->
+	<select id="selectByMap" parameterClass="java.util.Map" resultMap="userRolePOJOResult">
+		select 
+			ur.USER_ROLE_ID as USER_ROLE_ID,
+			ur.USER_ID as USER_ID,
+			ur.ROLE_ID as ROLE_ID,
+			ur.CREATE_USERID as  CREATE_USERID,
+			ur.CREATE_TIME as CREATE_TIME,
+			ur.UPDATE_USERID as UPDATE_USERID,
+			ur.UPDATE_TIME as UPDATE_TIME,
+			ur.STATUS as STATUS,
+			r.role_name  as ROLE_NAME,
+			GROUP_CONCAT(r.role_name) as ROLE_NAMES
+		from 
+			monitor_user_role as ur 
+		LEFT JOIN monitor_role as r 
+		ON ur.role_id=r.role_id
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="userId">
+				ur.USER_ID=#userId#
+			</isNotNull>
+			<isNotNull prepend="and" property="status">
+				ur.STATUS=#status#
+			</isNotNull>
+		</dynamic>
+		GROUP BY ur.user_id
+	</select>
+	<!-- 查询用户所有的角色，不会把多个角色合并为1行 -->
+	<select id="findAllRolesByUserId" parameterClass="java.lang.Integer" resultClass="userRolePOJO">
+	    select 
+			ur.USER_ROLE_ID as userRoleId,
+			ur.USER_ID as userId,
+			ur.ROLE_ID as roleId
+		from 
+			monitor_user_role as ur 
+		where ur.USER_ID=#userId#
+	</select>
+	<!-- 删除指定用户或者角色对应的数据，就是把status 该为 -1 -->
+	<update id="deleteUserRoleByUpdate" parameterClass="java.util.Map">
+		update monitor_user_role set status=-1 
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="userId">
+				user_id=#userId#
+			</isNotNull>
+			<isNotNull prepend="and" property="roleId">
+				role_id=#roleId#
+			</isNotNull>
+		</dynamic>
+	</update>
+	 
+</sqlMap>

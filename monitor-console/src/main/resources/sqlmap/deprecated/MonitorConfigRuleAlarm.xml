@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.config.MonitorConfigRuleAlarmPOJO">
+	<typeAlias alias="monitorConfigRuleAlarmPOJO"
+		type="com.moreopen.monitor.console.dao.bean.config.MonitorConfigRuleAlarmPOJO"/>
+		
+	<resultMap id="monitorConfigRuleAlarmPOJOResult" class="monitorConfigRuleAlarmPOJO">
+
+		<result column="ID" jdbcType="Integer" property="id" />
+		<result column="monitorAlarmRuleId" jdbcType="VARCHAR" property="monitorAlarmRuleId" />
+		<result column="monitorAlarmRuleName" jdbcType="VARCHAR" property="monitorAlarmRuleName" />
+		<result column="thresholdUnit" jdbcType="VARCHAR" property="thresholdUnit" />
+		<result column="threshold" jdbcType="LONG" property="threshold" />
+		<result column="monitorAlarmWay" jdbcType="VARCHAR" property="monitorAlarmWay" />
+		<result column="monitorAlarmWaySymbol" jdbcType="VARCHAR" property="monitorAlarmWaySymbol" />
+		<result column="monitorAlarmCondition" jdbcType="VARCHAR" property="monitorAlarmCondition" />
+		<result column="monitorEventId" jdbcType="VARCHAR" property="monitorEventId" />
+		<result column="monitorEventItemId" jdbcType="VARCHAR" property="monitorEventItemId" />
+		<result column="status" jdbcType="VARCHAR" property="status" />
+		<result column="createTime" jdbcType="Timestamp" property="createTime" />
+		<result column="updateTime" jdbcType="Timestamp" property="updateTime"/>
+		<result column="createUserId" jdbcType="VARCHAR" property="createUserId"/>
+		<result column="updateUserId" jdbcType="VARCHAR" property="updateUserId"/>
+		<result column="alarmInterval" jdbcType="Integer" property="monitorAlarmInterval"/>
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+		<result column="monitorUserIds" jdbcType="VARCHAR" property="monitorUserIds"/>
+		<result column="monitorAlarmConditionSymbol" jdbcType="VARCHAR" property="monitorAlarmConditionSymbol"/>
+		
+		<result column="monitorEventName" jdbcType="VARCHAR" property="monitorEventName"/>
+		<result column="monitorEventItemName" jdbcType="VARCHAR" property="monitorEventItemName"/>
+		<result column="appName" jdbcType="VARCHAR" property="appName"/>
+		<result column="monitorStatusString" jdbcType="VARCHAR" property="monitorStatusString"/>
+	</resultMap>
+
+	<!-- 根据条件查询-->
+	<select id="selectByMap" parameterClass="java.util.Map"  resultMap="monitorConfigRuleAlarmPOJOResult">
+				SELECT
+					temp.*, monitor_user .user_name AS updateUserName,
+					monitor_config_event.monitor_event_name as monitorEventName, 
+					monitor_config_event.monitor_event_id as monitorEventId,
+					monitor_config_event_item.monitor_event_item_name as monitorEventItemName,
+					monitor_config_app.app_name as appName,
+					monitor_config_app.app_id as appId
+				FROM
+					(
+						SELECT
+							ID AS ID,
+							monitor_alarm_rule_id AS monitorAlarmRuleId,
+							monitor_alarm_rule_name AS monitorAlarmRuleName,
+							threshold_unit AS thresholdUnit,
+							threshold AS threshold,
+							monitor_alarm_way AS monitorAlarmWay,
+							CASE monitor_alarm_way
+							when '1' THEN 'email'
+							when '2' THEN 'phone'
+							when '3' THEN 'email+phone'
+							end as monitorAlarmWaySymbol,
+							monitor_alarm_condition AS monitorAlarmCondition,
+							CASE monitor_alarm_condition
+								WHEN 'lt' THEN
+									'&lt;'
+								WHEN 'gt' THEN
+									'&gt;'
+								WHEN 'eq' THEN
+									'='
+								END AS monitorAlarmConditionSymbol,
+							monitor_event_id AS monitorEventId,
+							monitor_event_item_id AS monitorEventItemId,
+							monitor_config_rule_alarm. STATUS AS STATUS,
+							CASE monitor_config_rule_alarm. STATUS
+							 WHEN '2' THEN '正常'
+							 WHEN '3' THEN '停止'
+							END AS monitorStatusString,
+							monitor_config_rule_alarm.create_time AS createTime,
+							monitor_config_rule_alarm.update_time AS updateTime,
+							monitor_config_rule_alarm.create_userid AS createUserId,
+							monitor_config_rule_alarm.update_userid AS updateUserId,
+							alarm_interval AS alarmInterval,
+							monitor_config_rule_alarm.alarm_userids AS monitorUserIds,
+							monitor_user .user_name AS createUserName,
+							date_format(
+								monitor_config_rule_alarm.CREATE_TIME,
+								'%Y-%m-%d %T'
+							) AS createTimeFormat,
+							date_format(
+								monitor_config_rule_alarm.UPDATE_TIME,
+								'%Y-%m-%d %T'
+							) AS updateTimeFormat
+					FROM
+						monitor_config_rule_alarm
+					LEFT JOIN monitor_user ON monitor_config_rule_alarm.create_userid = monitor_user .user_id
+					) AS temp
+				LEFT JOIN monitor_user ON temp.UPDATEUSERID = monitor_user .user_id
+				LEFT JOIN monitor_config_event ON temp.monitorEventId = monitor_config_event.monitor_event_id
+				LEFT JOIN monitor_config_event_item ON temp.monitorEventItemId = monitor_config_event_item.monitor_event_item_id
+				LEFT JOIN monitor_config_app on monitor_config_event.app_id=monitor_config_app.app_id
+			<dynamic prepend="where">
+			    <isNotNull property="eventId" prepend="and">
+			        temp.monitorEventId=#eventId#
+			    </isNotNull>
+			    <isNotNull property="itemId" prepend="and">
+			        temp.monitorEventItemId=#itemId#
+			    </isNotNull>
+			</dynamic>
+			<dynamic>
+			    <isNotNull property="startPostion">
+						limit #startPostion#,#pageSize#
+				</isNotNull>
+			</dynamic>
+	</select>
+	
+	<!--  查询总条数-->
+	<select id="count" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+		SELECT COUNT(*) FROM monitor_config_rule_alarm
+		<dynamic prepend="where">
+		    <isNotNull  prepend="and" property="eventId">
+		        monitor_event_id=#eventId#
+		    </isNotNull>
+		    <isNotNull prepend="and" property="itemId">
+		        monitor_event_item_id=#itemId#
+		    </isNotNull>
+		</dynamic>
+	</select>
+	
+	<!-- 添加ruleAlarm -->
+	<insert id="insert" parameterClass="monitorConfigRuleAlarmPOJO">
+		insert into monitor_config_rule_alarm
+		(
+			monitor_alarm_rule_id,
+			monitor_alarm_rule_name,
+			threshold_unit,
+			threshold,
+			monitor_alarm_way,
+			monitor_alarm_condition,
+			monitor_event_id,
+			monitor_event_item_id,
+			status,
+			create_time,
+			create_userid,
+			alarm_interval,
+			update_time,
+			update_userid,
+			alarm_userids
+		) values(
+			#monitorAlarmRuleId#,
+			#monitorAlarmRuleName#,
+			#thresholdUnit#,
+			#threshold#,
+			#monitorAlarmWay#,
+			#monitorAlarmCondition#,
+			#monitorEventId#,
+			#monitorEventItemId#,
+			#status#,
+			#createTime#,
+			#createUserId#,
+			#monitorAlarmInterval#,
+			#updateTime#,
+			#updateUserId#,
+			#monitorUserIds#
+		)
+		 
+	</insert>
+	
+	<update id="update" parameterClass="monitorConfigRuleAlarmPOJO">
+	    update monitor_config_rule_alarm
+	    set 
+	  	monitor_alarm_rule_name=#monitorAlarmRuleName#,
+	  	threshold_unit=#thresholdUnit#,
+	  	threshold=#threshold#,
+	  	monitor_alarm_way=#monitorAlarmWay#,
+	  	monitor_alarm_condition=#monitorAlarmCondition#,
+	  	update_time=#updateTime#,
+	  	update_userid=#updateUserId#,
+	  	alarm_interval=#monitorAlarmInterval#,
+	  	alarm_userids=#monitorUserIds#,
+	  	monitor_event_item_id=#monitorEventItemId#
+	  	where id=#id#
+	    
+	</update>
+	
+	<!-- 更改报警的状态 -->
+	<update id="updateRuleAlarmStatus" parameterClass="java.util.Map">
+	     update monitor_config_rule_alarm
+	     set
+	     status=#status#,
+	     update_time=#updateTime#,
+	  	 update_userid=#updateUserId#
+	     where id=#id#
+	</update>
+	
+	
+	
+	<!-- 删除 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_config_rule_alarm where id=#id#
+	</delete>
+	
+	<!-- 根据 eventId 删除 -->
+	<delete id="removeByEventId" parameterClass="java.lang.String">
+		delete from monitor_config_rule_alarm where monitor_event_id=#monitorEventId#
+	</delete>
+	
+	<!-- 根据 itemId 删除 -->
+	<delete id="removeByItemId" parameterClass="java.lang.String">
+		delete from monitor_config_rule_alarm where monitor_event_item_id=#monitorEventItemId#
+	</delete>
+	
+	<!-- 根据alaramId 查询 -->
+	<select id="queryListByAlarmId" parameterClass="java.lang.String" resultClass="monitorConfigRuleAlarmPOJO">
+	    select id
+	    from monitor_config_rule_alarm
+	    where monitor_alarm_rule_id=#monitorAlarmRuleId#
+	</select>
+	
+	<!-- 根据报警规则名称搜索 -->
+	<select id="searchByAlarmName" parameterClass="java.util.Map" resultMap="monitorConfigRuleAlarmPOJOResult">
+		    		SELECT
+						temp.*, monitor_user .user_name AS updateUserName,
+						monitor_config_event.monitor_event_name as monitorEventName, 
+						monitor_config_event.monitor_event_id as monitorEventId,
+						monitor_config_event_item.monitor_event_item_name as monitorEventItemName,
+						monitor_config_app.app_name as appName,
+						monitor_config_app.app_id as appId
+					FROM
+						(
+							SELECT
+								ID AS ID,
+								monitor_alarm_rule_id AS monitorAlarmRuleId,
+								monitor_alarm_rule_name AS monitorAlarmRuleName,
+								threshold_unit AS thresholdUnit,
+								threshold AS threshold,
+								monitor_alarm_way AS monitorAlarmWay,
+								CASE monitor_alarm_way
+									when '1' THEN 'email'
+									when '2' THEN 'phone'
+									when '3' THEN 'email+phone'
+								end as monitorAlarmWaySymbol,
+								monitor_alarm_condition AS monitorAlarmCondition,
+								CASE monitor_alarm_condition
+							WHEN 'lt' THEN
+								'&lt;'
+							WHEN 'gt' THEN
+								'&gt;'
+							WHEN 'eq' THEN
+								'='
+							END AS monitorAlarmConditionSymbol,
+							monitor_event_id AS monitorEventId,
+							monitor_event_item_id AS monitorEventItemId,
+							monitor_config_rule_alarm. STATUS AS STATUS,
+							CASE monitor_config_rule_alarm. STATUS
+							 WHEN '2' THEN '正常'
+							 WHEN '3' THEN '停止'
+							END AS monitorStatusString,
+							monitor_config_rule_alarm.create_time AS createTime,
+							monitor_config_rule_alarm.update_time AS updateTime,
+							monitor_config_rule_alarm.create_userid AS createUserId,
+							monitor_config_rule_alarm.update_userid AS updateUserId,
+							alarm_interval AS alarmInterval,
+							monitor_config_rule_alarm.alarm_userids AS monitorUserIds,
+							monitor_user .user_name AS createUserName,
+							date_format(
+								monitor_config_rule_alarm.CREATE_TIME,
+								'%Y-%m-%d %T'
+							) AS createTimeFormat,
+							date_format(
+								monitor_config_rule_alarm.UPDATE_TIME,
+								'%Y-%m-%d %T'
+							) AS updateTimeFormat
+						FROM
+							monitor_config_rule_alarm
+						LEFT JOIN monitor_user ON monitor_config_rule_alarm.create_userid = monitor_user .user_id
+							<dynamic prepend="where">
+							    <isNotNull prepend="and" property="alarmName">
+							        	 monitor_config_rule_alarm.monitor_alarm_rule_name like '%$alarmName$%'
+							    </isNotNull>
+							    <isNotNull prepend="and" property="alarmId">
+							         monitor_config_rule_alarm.monitor_alarm_rule_id like '%$alarmId$%'
+							    </isNotNull>
+							    <isNotNull prepend="and" property="item">
+							        monitor_event_item_id=#item#
+							    </isNotNull>
+							</dynamic>
+						) AS temp
+					LEFT JOIN monitor_user ON temp.UPDATEUSERID = monitor_user .user_id
+				
+					LEFT JOIN monitor_config_event ON temp.monitorEventId = monitor_config_event.monitor_event_id
+					LEFT JOIN monitor_config_event_item ON temp.monitorEventItemId = monitor_config_event_item.monitor_event_item_id
+					LEFT JOIN monitor_config_app on monitor_config_event.app_id=monitor_config_app.app_id
+			
+	</select>
+	
+</sqlMap>

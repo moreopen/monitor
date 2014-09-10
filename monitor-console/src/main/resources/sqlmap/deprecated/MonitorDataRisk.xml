@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.monitor.MonitorDataRiskPOJO">
+	<typeAlias alias="monitorDataRiskPOJO"
+		type="com.moreopen.monitor.console.dao.bean.monitor.MonitorDataRiskPOJO" />
+		
+	<resultMap id="monitorDataRiskPOJOResult" class="monitorDataRiskPOJO">
+
+		<result column="id" jdbcType="Integer" property="id" />
+		<result column="risk_event_id" jdbcType="VARCHAR" property="riskEventId" />
+		<result column="risk_event_name" jdbcType="VARCHAR" property="riskEventName" />
+		
+		<result column="risk_level" jdbcType="VARCHAR" property="riskLevel" />
+		<result column="risk_describe" jdbcType="VARCHAR" property="riskDescribe" />
+
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_userid" jdbcType="VARCHAR" property="createUserId" />
+		
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="update_userid" jdbcType="VARCHAR" property="updateUserId" />
+		
+		<result column="risk_dealwith_describe" jdbcType="VARCHAR" property="riskDealwithDescribe" />
+		<result column="monitor_event_id" jdbcType="VARCHAR" property="monitorEventId"/>
+		<result column="monitor_event_item_id" jdbcType="VARCHAR" property="monitorEventItemId"/>
+		
+		<result column="event_create_time" jdbcType="TIMESTAMP" property="eventCreateTime"/>
+		<result column="hms" jdbcType="VARCHAR" property="hms"/>
+		
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+		<result column="event_ip" jdbcType="VARCHAR" property="ipport"/>
+		
+		<result column="monitorEventItemName" jdbcType="VARCHAR" property="monitorEventItemName"/>
+		<result column="monitorEventName" jdbcType="VARCHAR" property="monitorEventName"/>
+		<result column="appName" jdbcType="VARCHAR" property="appName"/>
+		
+	</resultMap>
+	
+	<select id="selectByMap" parameterClass="java.util.Map" resultMap="monitorDataRiskPOJOResult">
+	select temp.*,monitor_user.user_name as updateUserName
+	     from(	
+	    	select 
+			monitor_data_risk.id,
+			risk_event_id,
+			risk_event_name,
+			risk_level,
+			risk_describe,
+			monitor_data_risk.create_time,
+			monitor_data_risk.create_userid,
+			monitor_data_risk.update_time,
+			monitor_data_risk.update_userid,
+			risk_dealwith_describe,
+			monitor_data_risk.monitor_event_id,
+			monitor_data_risk.monitor_event_item_id,
+			monitor_data_risk.event_create_time,
+			date_format(event_create_time,'%T') as hms,
+			
+			monitor_user.user_name as createUserName,
+				
+			date_format(monitor_data_risk.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+			date_format(monitor_data_risk.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat,
+			event_ip,
+			monitor_config_event_item.monitor_event_item_name as monitorEventItemName,
+			monitor_config_event.monitor_event_name as monitorEventName,
+			monitor_config_app.app_name as appName
+				
+		from
+			monitor_data_risk left join monitor_user
+		on 
+			monitor_data_risk.create_userid=monitor_user.user_id
+		LEFT JOIN monitor_config_event_item
+		on monitor_data_risk.monitor_event_item_id = monitor_config_event_item.monitor_event_item_id
+		LEFT JOIN monitor_config_event 
+		on monitor_data_risk.monitor_event_id = monitor_config_event.monitor_event_id
+		LEFT JOIN monitor_config_app
+		ON monitor_config_event.app_id = monitor_config_app.app_id
+		)as temp left join monitor_user
+		on temp.update_userid=monitor_user.user_id
+		<dynamic prepend="where">
+		    <isNotNull prepend="and" property="eventId">
+		        temp.monitor_event_id=#eventId#
+		    </isNotNull>
+		    <isNotNull prepend="and" property="itemId">
+		        temp.monitor_event_item_id=#itemId# 
+		    </isNotNull>
+		</dynamic>
+		<dynamic>
+		    <isNotNull property="startPostion">
+					limit #startPostion#,#pageSize#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<!-- 获取总条数 -->
+	<select id="count" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(*) from monitor_data_risk 
+		where monitor_event_id=#eventId# and monitor_event_item_id=#itemId#
+	</select>
+	
+	<select id="getDataRiskByDateIp" parameterClass="java.util.Map" resultClass="monitorDataRiskPOJO">
+	    select 
+			id,
+			risk_event_id as riskEventId,
+			risk_event_name as riskEventName,
+			risk_level as riskLevel,
+			risk_describe as riskDescribe,
+			create_time as createTime,
+			create_userid as createUserId,
+			update_time as updateTime,
+			update_userid asupdateUserId,
+			risk_dealwith_describe as riskDealwithDescribe,
+			monitor_event_id as monitorEventId,
+			monitor_event_item_id as monitorEventItemId,
+			event_create_time,
+			date_format(event_create_time,'%T') as hms,
+			event_ip
+		from
+			monitor_data_risk
+		where 
+			monitor_event_id=#eventId# 
+			and 
+			monitor_event_item_id=#itemId# 
+		<![CDATA[ 
+			and event_create_time>=#start# and event_create_time<=#end#
+		]]>
+		<dynamic prepend="and">
+		    <isNotNull property="ip">
+		        event_ip=#ip#
+		    </isNotNull>
+		</dynamic>
+			
+		
+	</select>
+	
+	<!-- 插入 -->
+	<insert id="insert" parameterClass="monitorDataRiskPOJO">
+	    insert into 
+	    monitor_data_risk(
+		    risk_event_id,
+		    risk_event_name,
+		    risk_level,
+		    risk_describe,
+		    
+		    create_time,
+		    create_userid,
+		    update_time,
+		    update_userid,
+		    
+		    monitor_event_id,
+		    monitor_event_item_id,
+		    event_create_time,
+		    event_ip
+		   
+		    
+	    )values(
+	    	#riskEventId#,
+	    	#riskEventName#,
+	    	#riskLevel#,
+	    	#riskDescribe#,
+	    	#createTime#,
+	    	#createUserId#,
+	    	#updateTime#,
+	    	#updateUserId#,
+	    	#monitorEventId#,
+	    	#monitorEventItemId#,
+	    	#eventCreateTime#,
+	    	#ipport#
+	    )
+	</insert>
+	
+	<!-- 更新 -->
+	<update id="update"  parameterClass="monitorDataRiskPOJO">
+	    update 
+	    	monitor_data_risk
+	    set 
+		    risk_event_name=#riskEventName#,
+		    risk_level=#riskLevel#,
+		    risk_describe=#riskDescribe#,
+		    risk_dealwith_describe=#riskDealwithDescribe#,
+		    update_time=#updateTime#,
+		    update_userid=#updateUserId#,
+		    monitor_event_id=#monitorEventId#,
+		    monitor_event_item_id=#monitorEventItemId#
+		    
+		where 
+			id=#id#
+	</update>
+	
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+	    delete from monitor_data_risk where id=#id#
+	</delete>
+	
+	<!-- 获取指定点的风险事件 -->
+	<select id="getPointRisk" parameterClass="java.util.Map" resultMap="monitorDataRiskPOJOResult">
+	     select temp.*,monitor_user.user_name as updateUserName
+	     from(	
+	    
+	    select 
+			id,
+			risk_event_id,
+			risk_event_name,
+			risk_level,
+			risk_describe,
+			monitor_data_risk.create_time,
+			monitor_data_risk.create_userid,
+			monitor_data_risk.update_time,
+			monitor_data_risk.update_userid,
+			risk_dealwith_describe,
+			monitor_event_id,
+			monitor_event_item_id,
+			event_create_time,
+			date_format(event_create_time,'%T') as hms,
+			monitor_user.user_name as createUserName,
+			date_format(monitor_data_risk.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+			date_format(monitor_data_risk.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat,
+			event_ip
+		from
+			monitor_data_risk left join monitor_user
+		on monitor_data_risk.create_userid=monitor_user.user_id
+		where 
+			monitor_event_id=#eventId# 
+			and 
+			monitor_event_item_id=#itemId#
+			and
+			event_create_time=#eventCreateTime#
+			
+			)as temp left join monitor_user
+		on temp.update_userid=monitor_user.user_id
+	</select>
+	
+	<select id="queryListByRiskEventId" parameterClass="java.lang.String" resultClass="monitorDataRiskPOJO">
+	    select id
+	    from monitor_data_risk
+	    where risk_event_id=#riskEventId#
+	</select>
+	
+	<!-- 根据风险名字 搜索 -->
+	<select id="searchByRiskName" parameterClass="java.util.Map" resultMap="monitorDataRiskPOJOResult">
+	     select temp.*,monitor_user.user_name as updateUserName
+	     from(	
+	    select 
+			monitor_data_risk.id,
+			risk_event_id,
+			risk_event_name,
+			risk_level,
+			risk_describe,
+			monitor_data_risk.create_time,
+			monitor_data_risk.create_userid,
+			monitor_data_risk.update_time,
+			monitor_data_risk.update_userid,
+			risk_dealwith_describe,
+			monitor_data_risk.monitor_event_id,
+			monitor_data_risk.monitor_event_item_id,
+			monitor_data_risk.event_create_time,
+			date_format(event_create_time,'%T') as hms,
+			
+			monitor_user.user_name as createUserName,
+				
+			date_format(monitor_data_risk.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+			date_format(monitor_data_risk.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat,
+			event_ip,
+			monitor_config_event_item.monitor_event_item_name as monitorEventItemName,
+			monitor_config_event.monitor_event_name as monitorEventName,
+			monitor_config_app.app_name as appName
+				
+		from
+			monitor_data_risk left join monitor_user
+		on 
+			monitor_data_risk.create_userid=monitor_user.user_id
+		LEFT JOIN monitor_config_event_item
+		on monitor_data_risk.monitor_event_item_id = monitor_config_event_item.monitor_event_item_id
+		LEFT JOIN monitor_config_event 
+		on monitor_data_risk.monitor_event_id = monitor_config_event.monitor_event_id
+		LEFT JOIN monitor_config_app
+		ON monitor_config_event.app_id = monitor_config_app.app_id
+		<dynamic prepend="where">
+			    <isNotNull prepend="and" property="riskName">
+					monitor_data_risk.risk_event_name like '%$riskName$%'
+			    </isNotNull>
+			    <isNotNull prepend="and" property="riskId">
+			        monitor_data_risk.risk_event_id like '%$riskId$%'
+			    </isNotNull>
+			    <isNotNull prepend="and" property="item">
+			        monitor_data_risk.monitor_event_item_id=#item#
+			    </isNotNull>
+			</dynamic>
+			
+		)as temp left join monitor_user
+		on temp.update_userid=monitor_user .user_id
+	</select>
+	
+</sqlMap>

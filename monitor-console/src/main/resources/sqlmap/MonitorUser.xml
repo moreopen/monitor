@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="com.moreopen.monitor.console.dao.bean.menu.UserPOJO">
+	<typeAlias alias="userPOJO"
+		type="com.moreopen.monitor.console.dao.bean.menu.UserPOJO" />
+		
+	<resultMap id="userPOJOResult" class="userPOJO">
+
+		<result column="USER_ID" jdbcType="Integer" property="userId" />
+		<result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
+		<result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+
+		
+		<result column="CREATE_USERID" jdbcType="Integer" property="createUserId" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+
+		<result column="UPDATE_USERID" jdbcType="Integer" property="updateUserId" />
+		<result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+		
+		<result column="STATUS" jdbcType="Integer" property="status" />
+		
+		<result column="roleNames" jdbcType="VARCHAR" property="roleNames"/>
+		<result column="ROLE_ID" jdbcType="Integer" property="roleId"/>
+		
+		<result column="PHONE" jdbcType="VARCHAR" property="phone"/>
+		<result column="EMAIL" jdbcType="VARCHAR" property="email"/>
+		
+		<result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+		<result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+		<result column="createTimeFormat" jdbcType="VARCHAR" property="createTimeFormat"/>
+		<result column="updateTimeFormat" jdbcType="VARCHAR" property="updateTimeFormat"/>
+		
+	</resultMap>
+	
+	
+	<!-- 增 -->
+	<insert id="insert" parameterClass="userPOJO">
+		insert monitor_user(USER_ID,USER_NAME,PASSWORD,CREATE_USERID,CREATE_TIME,STATUS,PHONE,EMAIL)
+		values(#userId#,#userName#,#password#,#createUserId#,#createTime#,#status#,#phone#,#email#)
+	</insert>
+	
+	<!-- 删 -->
+	<delete id="deleteByPrimaryKey" parameterClass="java.lang.Integer">
+		delete from monitor_user where USER_ID=#userId#
+	</delete>
+	
+	<!-- 改 -->
+	<update id="update" parameterClass="userPOJO">
+		update monitor_user 
+			<dynamic prepend="set">
+			
+				<isNotNull prepend="," property="password">
+					PASSWORD=#password#
+				</isNotNull>
+				
+				<isNotNull prepend="," property="status">
+					STATUS=#status#
+				</isNotNull>
+				
+				<isNotNull prepend="," property="updateUserId">
+					UPDATE_USERID=#updateUserId#
+				</isNotNull>
+				
+				<isNotNull prepend="," property="updateTime">
+					UPDATE_TIME=#updateTime#
+				</isNotNull>
+				<isNotNull prepend="," property="phone">
+					phone=#phone#
+				</isNotNull>
+				<isNotNull prepend="," property="email">
+					email=#email#
+				</isNotNull>
+			</dynamic>
+		where USER_ID=#userId#
+	</update>
+	
+	<!-- 查-->
+	<select id="selectByMap" resultMap="userPOJOResult" parameterClass="java.util.Map">
+		select 
+		user.*,
+		GROUP_CONCAT(ROLE_NAME) as roleNames,
+		ur_u.role_id as ROLE_ID
+		from
+		(
+				select u2.*,u3.user_name as updateUserName 
+				from(
+					select 
+						u.USER_ID as USER_ID,
+						u.USER_NAME as USER_NAME,
+						u.password  as PASSWORD,
+						u.CREATE_USERID as CREATE_USERID,
+						u.CREATE_TIME as CREATE_TIME,
+						u.UPDATE_USERID as UPDATE_USERID,
+						u.UPDATE_TIME as UPDATE_TIME,
+						
+						date_format(u.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
+						date_format(u.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat,
+		
+						u.STATUS as STATUS,
+						u.PHONE as PHONE,
+						u.EMAIL as EMAIL,
+						u1.user_name as createUserName
+					from monitor_user as u LEFT JOIN monitor_user as u1
+					on u.create_userid=u1.user_id
+				) as u2 left join monitor_user as u3
+				on u2.update_userid=u3.user_id
+		)as user LEFT JOIN
+			(
+				select ur.user_id,ur.role_id,r.role_name 
+				from monitor_user_role as ur ,monitor_role as r 
+				where ur.role_id=r.role_id
+			) 
+			as ur_u
+		on user.user_id=ur_u.user_id
+		
+		
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="status">
+				user.status=#status#
+			</isNotNull>
+			<isNotNull prepend="and" property="userName">
+				user.USER_NAME=#userName#
+			</isNotNull>
+			<isNotNull prepend="and" property="password">
+				user.PASSWORD=#password#
+			</isNotNull>
+		</dynamic>
+		GROUP BY(user.user_id)
+		<dynamic prepend="limit">
+			<isNotNull property="startPostion">
+				#startPostion#,#pageSize#
+			</isNotNull>
+		</dynamic>
+		
+		
+	</select>
+	
+	<!-- 总条数 -->
+	<select id="count" resultClass="java.lang.Integer" parameterClass="java.util.Map" >
+		select count(*) from monitor_user
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="status">
+				status=#status#
+			</isNotNull>
+			<isNotNull prepend="and" property="userName">
+				USER_NAME=#userName#
+			</isNotNull>
+			
+		</dynamic>
+	</select>
+	
+	<select id="queryAllUsers" resultClass="userPOJO">
+	   select 
+			u.USER_ID as userId,
+			u.USER_NAME as userName,
+			u.PHONE as phone,
+			u.EMAIL as email
+			
+		from monitor_user as u
+	</select>
+	
+	<!-- 根据用户名和密码查找 -->
+	<select id="queryUserByUserNameAndPW" parameterClass="java.util.Map" resultClass="userPOJO">
+			select 
+						USER_ID as userId,
+						USER_NAME as userName,
+						PHONE as phone,
+						EMAIL as email
+	    from monitor_user
+	    where USER_NAME=#userName# and password=#password#
+	</select>
+	
+	<!-- 根据传进来的id 列表查询 -->
+	<select id="queryUsersByIdList" parameterClass="java.util.Map" resultClass="userPOJO">
+	    select 
+						group_concat(USER_NAME) as userNames,
+						group_concat(PHONE) as phones,
+						group_concat(EMAIL) as emails
+	    from monitor_user
+	   <dynamic prepend="where">
+				<isNotNull prepend="and" property="monitorUserIdsList">
+					<iterate property="monitorUserIdsList" open="(" close=")" conjunction="or">
+			          user_id=#monitorUserIdsList[]#
+			        </iterate>
+		        </isNotNull>
+		</dynamic>
+	</select>
+	 
+	
+</sqlMap>
