@@ -21,8 +21,8 @@
 		<property name="jdbcUrl" value="${jdbc.url}" />
 		<property name="user" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-		<property name="minPoolSize" value="5" />
-		<property name="maxPoolSize" value="${jdbc.maxActive}" />
+		<property name="minPoolSize" value="${jdbc.minPoolSize}" />
+		<property name="maxPoolSize" value="${jdbc.maxPoolSize}" />
 		<property name="initialPoolSize" value="1" />
 		<property name="testConnectionOnCheckout" value="false" />
 		<property name="testConnectionOnCheckin" value="false" />

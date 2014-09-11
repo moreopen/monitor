@@ -12,6 +12,7 @@
 	<modules>
 		<module>monitor-server</module>
 		<module>monitor-agent</module>
+		<module>monitor-console</module>
 	</modules>
 	
 	<properties>
