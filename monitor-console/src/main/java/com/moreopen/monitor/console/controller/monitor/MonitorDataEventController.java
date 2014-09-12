@@ -16,6 +16,7 @@ import com.moreopen.monitor.console.biz.monitor.MonitorDataEventServiceImpl;
 import com.moreopen.monitor.console.controller.BaseController;
 import com.moreopen.monitor.console.dao.bean.monitor.MonitorDataEventPOJO;
 import com.moreopen.monitor.console.utils.DateTools;
+import com.moreopen.monitor.console.utils.JsonUtils;
 
 @Controller
 public class MonitorDataEventController  extends BaseController {
@@ -36,7 +37,7 @@ public class MonitorDataEventController  extends BaseController {
 		String menuCode = request.getParameter("menuCode");
 		List<MonitorDataEventPOJO> list = monitorDataEventServiceImpl.getOneDayDataByEventIdItemIdDate(date, ip, menuCode);
 		
-		outputResult2Client(response, jsonSerializer.encode(list));
+		outputResult2Client(response, JsonUtils.bean2Json(list));
 		
 	}
 	/**
@@ -60,7 +61,7 @@ public class MonitorDataEventController  extends BaseController {
 		List<MonitorDataEventPOJO> averageTimeList = monitorDataEventServiceImpl
 				.getListByEventIdItemIdEventCreateTimeIp(longEventCreateTime, ip, menuCode);
 		
-		outputResult2Client(response, jsonSerializer.encode(averageTimeList));
+		outputResult2Client(response, JsonUtils.bean2Json(averageTimeList));
 		
 	}
 }

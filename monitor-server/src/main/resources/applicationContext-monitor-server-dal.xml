@@ -56,7 +56,7 @@
 		<property name="port" value="${monitor.redis.port}"></property>
 		<property name="poolConfig">
 			<bean class="redis.clients.jedis.JedisPoolConfig">
-				<property name="maxActive" value="${monitor.redis.pool.maxActive}"/>
+				<property name="maxTotal" value="${monitor.redis.pool.maxActive}"/>
 				<property name="maxIdle" value="${monitor.redis.pool.maxIdle}"/>
 				<property name="minIdle" value="${monitor.redis.pool.minIdle}"/>
 				<property name="testWhileIdle" value="${monitor.redis.pool.testWhileIdle}"/>

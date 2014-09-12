@@ -46,7 +46,7 @@ public class RoleController extends BaseController {
 			HttpSession session = request.getSession();
 			Integer userId = Integer.valueOf(SessionContextUtils.getUser(session).getUserId());
 			RolePOJO role = roleServiceImpl.addRole(roleName, userId);
-			String result = new String(jsonSerializer.encode(role));
+			String result = JsonUtils.bean2Json(role);
 			
 			outputResult2Client(response, result);
 		}
@@ -96,7 +96,7 @@ public class RoleController extends BaseController {
 
 		List<RolePOJO> list = roleServiceImpl.queryListByPage(status, PageTools.parsePage(page), PageTools.parseRows(rows));
 
-		String result = JsonUtils.parseJson(totalSize, list, jsonSerializer);
+		String result = JsonUtils.parseJson(totalSize, list);
 		
 		outputResult2Client(response, result);
 	}
@@ -116,7 +116,7 @@ public class RoleController extends BaseController {
 		Integer totalSize = roleServiceImpl.countByStatus(status);
 		List<RolePOJO> list = roleServiceImpl.queryAllRole(status, PageTools.parsePage(page), PageTools.parseRows(rows));
 
-		String result = JsonUtils.parseJson(totalSize, list, jsonSerializer);
+		String result = JsonUtils.parseJson(totalSize, list);
 
 		outputResult2Client(response, result);
 		
@@ -141,13 +141,7 @@ public class RoleController extends BaseController {
 
 		List<RolePOJO> list = roleServiceImpl.queryByRoleName(status, roleName);
 
-		StringBuffer strB = new StringBuffer();
-		strB.append("{\"total\":\"").append(totalSize).append("\",");
-		strB.append("\"rows\":");
-
-		strB.append(new String(jsonSerializer.encode(list), "utf-8"));
-		strB.append("}");
-		String result = strB.toString();
+		String result = JsonUtils.parseJson(totalSize, list);
 		outputResult2Client(response, result);
 	}
 	
@@ -176,7 +170,7 @@ public class RoleController extends BaseController {
 		String status = request.getParameter("status") == null ? "1" : request.getParameter("status");
 		List<RoleResourcePOJO> list = roleServiceImpl.getResourcesByRoleId(Integer.valueOf(status), Integer.valueOf(roleId));
 
-		String result = new String(jsonSerializer.encode(list), "utf-8");
+		String result = JsonUtils.bean2Json(list);
 		outputResult2Client(response, result);
 	}
 	

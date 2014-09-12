@@ -72,10 +72,9 @@
 					alert("该用户名已经被占用！");
 				}else{
 					$("#addDlg").dialog('close');
-					var json=eval("("+msg+")");
-					$('#dg').datagrid('appendRow',
-							json
-					);
+					/* var json=eval("("+msg+")");
+					$('#dg').datagrid('appendRow',json); */
+					$("#dg").datagrid("reload");
 					$("#newUserName").val("");
 					$("#newPassword").val("");
 					$("#newIphone").val("");

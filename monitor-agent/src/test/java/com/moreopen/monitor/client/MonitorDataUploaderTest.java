@@ -1,5 +1,6 @@
 package com.moreopen.monitor.client;
 
+import org.apache.commons.lang.math.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,9 +27,9 @@ public class MonitorDataUploaderTest {
 	@Test
 	public void test() {
 		for (int i = 0; i < 10000; i++) {
-			monitorDataUploader.setValue(key0, 1, MonitorDataType.INCREMENT);
-			monitorDataUploader.setValue(key1, 2.01, MonitorDataType.AVERAGE);
-			monitorDataUploader.setValue(key2, 3.6, MonitorDataType.MAX);
+			monitorDataUploader.setValue(key0, 1 * RandomUtils.nextInt(20), MonitorDataType.INCREMENT);
+			monitorDataUploader.setValue(key1, 2.01 * RandomUtils.nextInt(20), MonitorDataType.AVERAGE);
+			monitorDataUploader.setValue(key2, 3.6 * RandomUtils.nextInt(20), MonitorDataType.MAX);
 			if (i % 200 == 0) { 
 				System.out.println("set value ====== " + i);
 			}

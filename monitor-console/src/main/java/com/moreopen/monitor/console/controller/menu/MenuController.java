@@ -237,7 +237,7 @@ public class MenuController extends BaseController {
 		
 		List<MenuPOJO> list = menuDAO.getSecondMenus(Integer.valueOf(status), page, rows);
 		Integer totalSize = menuDAO.getSecondMenuCount(Integer.valueOf(status));
-		String dataJSON = JsonUtils.parseJson(totalSize, list, jsonSerializer);
+		String dataJSON = JsonUtils.parseJson(totalSize, list);
 		
 		outputResult2Client(response, dataJSON);
 		

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.moreopen.monitor.console.biz.monitor.MonitorHostServiceImpl;
 import com.moreopen.monitor.console.controller.BaseController;
+import com.moreopen.monitor.console.utils.JsonUtils;
 
 @Controller
 public class MonitorHostController extends BaseController {
@@ -33,7 +34,7 @@ public class MonitorHostController extends BaseController {
 		
 		String monitorCode = request.getParameter("menuCode");
 		Set<String> set = monitorHostServiceImpl.getIpListByMonitorCode(monitorCode);
-		outputResult2Client(response, jsonSerializer.encode(set));
+		outputResult2Client(response, JsonUtils.bean2Json(set));
 	}
 
 }

@@ -65,16 +65,16 @@
 				monitor_role.UPDATE_USERID as UPDATE_USERID,
 				monitor_role.UPDATE_TIME as UPDATE_TIME,
 				monitor_role.STATUS as STATUS,
-				GROUP_CONCAT(t.RESOURCE_NAME) as resourceNames,
+				GROUP_CONCAT(t.MENU_NAME) as resourceNames,
 				monitor_user.user_name as createUserName,
 				date_format(monitor_role.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
 				date_format(monitor_role.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat
 			FROM monitor_role 
 			LEFT JOIN
 				(
-					select monitor_role_resource.resource_id,monitor_role_resource.role_id,monitor_resource.resource_name 
-					from monitor_role_resource,monitor_resource 
-					where monitor_role_resource.resource_id=monitor_resource.resource_id 
+					select monitor_role_resource.menu_id,monitor_role_resource.role_id,monitor_menu.menu_name 
+					from monitor_role_resource,monitor_menu 
+					where monitor_role_resource.menu_id=monitor_menu.id 
 				) as t
 			on monitor_role.role_id =t.role_id 
 			left join monitor_user

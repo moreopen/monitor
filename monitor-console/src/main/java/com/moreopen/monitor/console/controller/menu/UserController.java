@@ -64,7 +64,7 @@ public class UserController extends BaseController {
 			outputResult2Client(response, MonitorConstant.hasDataResult);
 		} else {
 			userServiceImpl.addUser(userPOJO);
-			String result = new String(jsonSerializer.encode(userPOJO));
+			String result = JsonUtils.bean2Json(userPOJO);
 			outputResult2Client(response, result);
 		}
 		
@@ -130,7 +130,7 @@ public class UserController extends BaseController {
 
 		Integer totalSize = userServiceImpl.count(map);
 
-		String result = JsonUtils.parseJson(totalSize, list, jsonSerializer);
+		String result = JsonUtils.parseJson(totalSize, list);
 
 		outputResult2Client(response, result);
 	}
@@ -164,7 +164,7 @@ public class UserController extends BaseController {
 		map.put("userId", userId);
 		List<UserRolePOJO> list = userRoleServiceImpl.findAllRolesByUserId(Integer.parseInt(userId));
 		
-		String result = new String(jsonSerializer.encode(list), "utf-8");
+		String result = JsonUtils.bean2Json(list);
 		outputResult2Client(response, result);
 	}
 	
@@ -211,7 +211,7 @@ public class UserController extends BaseController {
 		
 		List<UserPOJO> list = userServiceImpl.queryAllUser();
 
-		outputResult2Client(response, new String(jsonSerializer.encode(list), "utf-8"));
+		outputResult2Client(response, JsonUtils.bean2Json(list));
 		
 	}
 }

@@ -32,7 +32,7 @@
  	**/
  		var forEverTag=null;//setTimeout 是否继续的标志
 		var timeInterval=300;//监控点的时间间隔, 默认300s
-		var refreshInterval=60;//页面刷新的时间间隔
+		var refreshInterval=180;//页面刷新的时间间隔
 		var fushu=0;
 		var ip="";//默认不传IP，表示所有的IP
 		var rangeSelected=2;

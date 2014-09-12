@@ -1,110 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <groupId>com.moreopen.monitor</groupId>
-    <artifactId>monitor</artifactId>
-    <version>1.0.2</version>
-    <relativePath>..</relativePath>
-  </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.moreopen.monitor</groupId>
+		<artifactId>monitor</artifactId>
+		<version>1.0.2</version>
+	</parent>
+
 	<artifactId>monitor-console</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1</version>
 	<packaging>jar</packaging>
 	<name>${project.artifactId} v${project.version}</name>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.home>${basedir}</project.home>
-		<venus.version>2.3.0</venus.version>
-		<spring.version>3.0.6.RELEASE</spring.version>
 		<jetty.version>8.0.0.M2</jetty.version>
-		<slf4j.version>1.5.8</slf4j.version>
-		<log4j.version>1.2.16</log4j.version>
 		<sdomq.version>1.4</sdomq.version>
 		<ramesses.version>0.0.1-SNAPSHOT</ramesses.version>
 	</properties>
-	
-  	<dependencies>
-  		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${log4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-				<version>4.10</version>
-				<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.meidusa.venus</groupId>
-			<artifactId>venus-backend</artifactId>
-			<version>${venus.version}</version>
-		</dependency>
-		
-		
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		
-		<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>${spring.version}</version>
-		</dependency>
-		
-		<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-orm</artifactId>
-				<version>${spring.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.5.1</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.moreopen</groupId>
-			<artifactId>iscribe</artifactId>
-			<version>1.0.7</version>
-		</dependency>
+	<dependencies>
 	
 		<!-- jetty -->
 		<dependency>
@@ -112,7 +29,7 @@
 			<artifactId>jetty-server</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-xml</artifactId>
@@ -124,66 +41,20 @@
 			<artifactId>jetty-webapp</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
-		
-		 <dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-		</dependency> 
 
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jsp-2.1-glassfish</artifactId>
 			<version>9.1.1.B60.25.p2</version>
-		</dependency> 
-		
-		
-		<dependency>
-				<groupId>org.apache.ibatis</groupId>
-				<artifactId>ibatis-sqlmap</artifactId>
-				<version>2.3.4.726</version>
-			</dependency>
-		
-		<dependency>
-	        <groupId>mysql</groupId>
-	        <artifactId>mysql-connector-java</artifactId>
-	        <version>5.1.15</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>c3p0</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-redis</artifactId>
-			<version>1.3.4.RELEASE</version>
-		</dependency>
-		
-		 <dependency>
-           <groupId>redis.clients</groupId>
-           <artifactId>jedis</artifactId>
-           <version>2.5.1</version>
-           <exclusions>
-           	<exclusion>
-           		<groupId>commons-pool</groupId>
-           		<artifactId>commons-pool</artifactId>
-           	</exclusion>
-           </exclusions>
-         </dependency>
-         
-         <!--dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-pool2</artifactId>
-			<version>2.2</version>
-		 </dependency-->
 
-  	</dependencies>
-	
-  	<build>
-  		<resources>
+		<!--dependency> <groupId>org.apache.commons</groupId> <artifactId>commons-pool2</artifactId> 
+			<version>2.2</version> </dependency -->
+
+	</dependencies>
+
+	<build>
+		<resources>
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
 			</resource>
@@ -221,17 +92,9 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
-		<!-- 	<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<excludes>
-						<exclude>**/test/integration/**/*.java</exclude>
-					</excludes>
-					<skip>true</skip>
-				</configuration>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> 
+				<version>2.5</version> <configuration> <excludes> <exclude>**/test/integration/**/*.java</exclude> 
+				</excludes> <skip>true</skip> </configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -264,7 +127,7 @@
 		</plugins>
 	</build>
 
-	
+
 	<profiles>
 		<profile>
 			<id>dev</id>

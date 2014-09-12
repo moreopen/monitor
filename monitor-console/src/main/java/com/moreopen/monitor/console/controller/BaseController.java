@@ -6,17 +6,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.meidusa.venus.io.serializer.json.JsonSerializer;
 import com.moreopen.monitor.console.constant.MonitorConstant;
 
 public class BaseController {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	@Autowired
-	protected JsonSerializer jsonSerializer;
 	
 	/**
 	 * 将结果输出到客户端

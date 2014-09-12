@@ -10,7 +10,6 @@ public class RolePOJO {
 	private Integer updateUserId;
 	private Date updateTime;
 	private Integer status;
-	private String resourceName;
 	
 	private String resourceNames;
 	
@@ -58,14 +57,6 @@ public class RolePOJO {
 
 	public void setUpdateUserName(String updateUserName) {
 		this.updateUserName = updateUserName;
-	}
-
-	public String getResourceName() {
-		return resourceName;
-	}
-
-	public void setResourceName(String resourceName) {
-		this.resourceName = resourceName;
 	}
 
 	public Integer getRoleId() {

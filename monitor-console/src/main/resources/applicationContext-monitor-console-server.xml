@@ -20,10 +20,6 @@
 			</list>
 		</property>
 	</bean>
-	
-	
-	<!-- json序列号相关 bean -->
-	<bean id="jsonSerializer" class="com.meidusa.venus.io.serializer.json.JsonSerializer" />
 
 	<!-- 菜单相关bean -->
 	<bean id="menuServiceImpl" class="com.moreopen.monitor.console.biz.menu.MenuServiceImpl" />
