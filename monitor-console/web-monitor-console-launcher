@@ -24,8 +24,8 @@ JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:gc.log"
 #JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
 
 CURRENT_DIR=`pwd`
-#设置 classpath 指向的路径, 可设置相对路径，也可设置绝对路径, exp: #CLASSPATH=".:$CURRENT_DIR/bin:$CURRENT_DIR/conf:$CURRENT_DIR/classes:$CURRENT_DIR/lib/*"
-CLASSPATH=".:$CURRENT_DIR/lib/*:$CURRENT_DIR/bin:$CURRENT_DIR/conf:$CURRENT_DIR/classes"
+#设置 classpath 指向的路径, 可设置相对路径，也可设置绝对路径, exp: #CLASSPATH="$CURRENT_DIR/bin:$CURRENT_DIR/conf:$CURRENT_DIR/classes:$CURRENT_DIR/lib/*"
+CLASSPATH="$CURRENT_DIR/lib/*:$CURRENT_DIR/bin:$CURRENT_DIR/conf:$CURRENT_DIR/classes"
 
 #指定系统日志和错误日志输出的日志文件
 LOG_PATH="std_out.log"
