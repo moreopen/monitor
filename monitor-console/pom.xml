@@ -10,7 +10,6 @@
 
 	<artifactId>monitor-console</artifactId>
 	<version>0.1</version>
-	<packaging>jar</packaging>
 	<name>${project.artifactId} v${project.version}</name>
 
 	<properties>

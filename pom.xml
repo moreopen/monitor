@@ -284,5 +284,20 @@
 			</dependency>
 		</dependencies>
 
-
+		<distributionManagement>
+			<repository>
+				<id>thirdparty</id>
+				<name>Deployment thirdparty</name>
+				<url>http://repo.maven.lenovo.com/nexus/content/repositories/thirdparty</url>
+			</repository>
+	
+			<snapshotRepository>
+				<id>snapshots</id>
+				<name>Deployment snapshots</name>
+				<url>http://repo.maven.lenovo.com/nexus/content/repositories/snapshots</url>
+				<uniqueVersion>true</uniqueVersion>
+			</snapshotRepository>
+			
+		</distributionManagement>
+		
 </project>
