@@ -33,7 +33,7 @@ public class MonitorDataUploaderTest {
 		monitorDataUploader = new DefaultMonitorDataUploader();
 		monitorDataUploader.setMonitorUrl(url);
 		monitorDataUploader.setHost("10.4.170.48");
-		monitorDataUploader.setUploadInterval(120);
+		monitorDataUploader.setUploadInterval(60);
 		monitorDataUploader.afterPropertiesSet();
 	}
 

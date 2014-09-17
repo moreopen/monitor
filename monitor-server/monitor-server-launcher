@@ -1,7 +1,7 @@
 #定义程序启动变量, 根据实际情况修改
 APP_MAIN_CLASS="com.moreopen.monitor.MonitorServerLauncher"
 APP_JMX_PORT="3344"
-MMS=512m
+MMS=1024m
 MMX=1024m
 #指定 java 启动参数, 以空格分隔
 ARGS=""
