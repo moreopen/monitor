@@ -36,6 +36,8 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 
 	private static final int HTTP_SOCKET_TIMEOUT_MILLISECONDS = 5000;
 	
+	private static final int SECONDS_IN_ONE_MINUTE = 60;
+	
 	private static final int DEFAULT_UPLOAD_INTERVAL = 180;
 	
 	private static final String ACTION_PARAM_NAME = "action";
@@ -75,6 +77,12 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 				logger.error("cannot get the host. Host is set as 127.0.0.1", uhe);
 			}
 			host = localhostAddress;
+		}
+		if (uploadInterval < SECONDS_IN_ONE_MINUTE) {
+			logger.warn(String
+					.format("upload interval is less than [%s]s, use default value [%s]s",
+							SECONDS_IN_ONE_MINUTE, DEFAULT_UPLOAD_INTERVAL));
+			uploadInterval = DEFAULT_UPLOAD_INTERVAL;
 		}
 		uploadExecutor = Executors.newScheduledThreadPool(uploadThreads, new CustomizableThreadFactory("Monitor-upload-"));
 		uploadExecutor.scheduleWithFixedDelay(new Runnable() {
