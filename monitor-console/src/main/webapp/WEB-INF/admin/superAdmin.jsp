@@ -185,5 +185,11 @@
 		<div id="easyui-tabs" class="easyui-tabs"
 			data-options="tools:'#tab-tools'" fit="true"></div>
 	</div>
+	
+	<!-- 南边区域 -->
+	<div data-options="region:'south',split:true" style="height:25px;background:url('/images/layout-browser-hd-bg.gif');padding:0px;text-align:center">
+		版权所有，侵权不究 &copy;monitor.moreopen
+	</div>
+	
 </body>
 </html>

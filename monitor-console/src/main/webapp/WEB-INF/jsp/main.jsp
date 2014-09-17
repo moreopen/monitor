@@ -15,6 +15,17 @@
 <script type="text/javascript" src="/js/main.js"></script>
 
 <script type="text/javascript">
+
+function getTitle(node) {
+	var title = node.text;
+	var p = $('#easyui-tree').tree('getParent', node.target);
+	while (p) {
+		title = p.text + "-" + title;
+		p = $('#easyui-tree').tree('getParent', p.target);
+	}
+	return title;
+}
+
 $(document).ready(function(){
 	$("#requestUrl").val("");
 	$('#easyui-tree').tree({
@@ -24,9 +35,11 @@ $(document).ready(function(){
 					alert("该菜单没有分配资源!");
 					return;
 				} */
-				if(!$('#easyui-tabs').tabs('exists',node.text)){//如果这个标题的tab还不存在，就添加
+				
+				var title = getTitle(node);
+				if(!$('#easyui-tabs').tabs('exists',title)){//如果这个标题的tab还不存在，就添加
 					$('#easyui-tabs').tabs('add',{
-							title: node.text,
+							title: title,
 							content: createFrame("/monitor/dataEvent/dataEventPage.htm?menuCode="+node.attributes.menuCode),  // the new content URL
 							//content: createFrame(node.attributes.resourceUrl),  // the new content URL
 							closable: true,
@@ -34,12 +47,12 @@ $(document).ready(function(){
 						});
 			
 				}else{	//如果已经存在，就让刷新并处于选中状态
-					$('#easyui-tabs').tabs('select',node.text);
+					$('#easyui-tabs').tabs('select',title);
 					var currTab = $('#easyui-tabs').tabs('getSelected');
 					$("#easyui-tabs").tabs("update",{
 						tab:currTab,
 						options:{
-							title: node.text,
+							title: title,
 							content: createFrame("/monitor/dataEvent/dataEventPage.htm?menuCode="+node.attributes.menuCode),  // the new content URL
 							//content: createFrame(node.attributes.resourceUrl),  // the new content URL
 							closable: true,
@@ -102,10 +115,10 @@ function createFrame(url)
 	
 	
 	
-	<!-- 南边区域
-	<div data-options="region:'south',split:true" style="height:50px;background:#A9FACD;padding:10px;text-align:center">
+	<!-- 南边区域 -->
+	<div data-options="region:'south',split:true" style="height:25px;background:url('/images/layout-browser-hd-bg.gif');padding:0px;text-align:center">
 		版权所有，侵权不究 &copy;monitor.moreopen
 	</div>
-	 -->
+	 
 </body>
 </html>

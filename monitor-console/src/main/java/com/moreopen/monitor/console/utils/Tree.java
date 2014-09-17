@@ -16,17 +16,18 @@ public class Tree {
 		strB.append("[");
 		for(MenuPOJO m:menuList){
 			strB.append("{\"id\":\"").append(m.getId()).append("\",");
-			strB.append("\"menuFloor\":").append(m.getMenuFloor()).append(",");
-			strB.append("\"menuIsleaf\":").append(m.getMenuIsleaf()).append(",");
-			strB.append("\"menuCode\":\"").append(m.getMenuCode()).append("\",");
-			strB.append("\"attributes\":{\"menuCode\":\"").append(m.getMenuCode()).append("\"},");
+//			strB.append("\"menuFloor\":").append(m.getMenuFloor()).append(",");
+//			strB.append("\"menuIsleaf\":").append(m.getMenuIsleaf()).append(",");
+//			strB.append("\"menuCode\":\"").append(m.getMenuCode()).append("\",");
+			strB.append("\"attributes\":{\"menuCode\":\"").append(m.getMenuCode()).append("\",\"pid\":\"").append(m.getMenuPid()).append("\"},");
 			strB.append("\"text\":\"").append(m.getMenuName()).append("\"");
 
 			if(m.getMenuIsleaf().equals(Integer.valueOf("-1"))){//不是叶子菜单就保持关闭状态
 				strB.append(",\"state\":\"closed\"");//定义状态
 			}
-			strB.append(",");
-			strB.append("\"parentId\":\"").append(m.getMenuPid()).append("\"},");
+//			strB.append(",");
+//			strB.append("\"parentId\":\"").append(m.getMenuPid()).append("\"},");
+			strB.append("},");
 		}
 		strB.append("]");
 		return strB.toString().replaceAll(",]", "]");

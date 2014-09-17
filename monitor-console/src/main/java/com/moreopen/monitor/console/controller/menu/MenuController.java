@@ -66,6 +66,7 @@ public class MenuController extends BaseController {
 			filterMenu(request, menuPid, menuList);
 			
 			String result = Tree.getMenuJSON(menuList);
+			
 			outputResult2Client(response, result);
 		} catch (Exception e) {
 			e.printStackTrace();

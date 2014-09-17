@@ -64,12 +64,14 @@ display: block
 		
 	</div>
 	<div data-options="region:'east',split:true,collapsed:true,title:'East'" style="width:300px;padding:10px;">east region</div>
-	<div data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;">
-		版权所有，侵权不究 &copy;monitor.moreopen
-	</div>
+	
 	<div data-options="region:'center',border:false">
 		<!-- tabs 页面-->
 		<div id="easyui-tabs" class="easyui-tabs" data-options="tools:'#tab-tools'" fit="true"></div>
+	</div>
+	<!-- 南边区域 -->
+	<div data-options="region:'south',split:true" style="height:25px;background:url('/images/layout-browser-hd-bg.gif');padding:0px;text-align:center">
+		版权所有，侵权不究 &copy;monitor.moreopen
 	</div>
 </body>
 </html>
