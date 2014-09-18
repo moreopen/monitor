@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,15 @@ public class JsonUtils {
 		}
 	}
 	
+	public static <T> T json2Bean(String json, TypeReference<T> typeReference) {
+		try {
+			return objectMapper.readValue(json, typeReference);
+		} catch (Exception e) {
+			logger.error("convert json to bean failed", e);
+			return null;
+		}
+	}
+	
 	public static String bean2Json(Object bean) {
 		try {
 			return objectMapper.writeValueAsString(bean);
@@ -54,4 +64,5 @@ public class JsonUtils {
 			return null;
 		}
 	}
+	
 }
