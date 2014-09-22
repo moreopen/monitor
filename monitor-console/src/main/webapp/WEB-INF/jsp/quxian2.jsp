@@ -497,8 +497,8 @@
       			    },
       			   plotOptions:{
       		            spline:{
-      		            	//dataGrouping: { enabled: true, approximation: "sum"},
-      		            	dataGrouping: { enabled: false},
+      		            	dataGrouping: { enabled: true, approximation: "sum", forced:true, units: [['minute',[5]]]},
+      		            	//dataGrouping: { enabled: false},
       		                /* point:{
       		                    events:{
       		                        click:function(){
