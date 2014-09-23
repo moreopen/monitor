@@ -3,6 +3,7 @@ package com.moreopen.monitor;
 import java.util.Properties;
 import java.util.TimeZone;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -18,6 +19,9 @@ public class MonitorServerLauncher {
 	private static Logger LOGGER = LoggerFactory.getLogger(MonitorServerLauncher.class);
 	
 	private static final int DEFAULT_JETTY_PORT  = 9090;
+	
+	//scheduled check log4j configuration file in ms
+	private static final int LOG4J_WATCH_PERIOD = 60*1000;
 
 	private Server server = null;
 
@@ -82,6 +86,16 @@ public class MonitorServerLauncher {
 		int port = DEFAULT_JETTY_PORT;
 		if (properties != null && properties.getProperty("jetty.port") != null) {
 			port = Integer.parseInt(properties.getProperty("jetty.port"));
+		}
+		//XXX set logger watch
+		try {
+			String logFile = MonitorServerLauncher.class.getResource("/log4j.xml").getFile();
+			PropertyConfigurator.configureAndWatch(logFile, LOG4J_WATCH_PERIOD);
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info(String.format("configure and watch log4j, check period [%d] ms", LOG4J_WATCH_PERIOD));
+			}
+		} catch (Exception e) {
+			LOGGER.warn("configure and watch log4j failed", e);
 		}
 		new MonitorServerLauncher(port).run();
 	}
