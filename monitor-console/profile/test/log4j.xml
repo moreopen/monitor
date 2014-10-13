@@ -35,16 +35,7 @@
 		<level value="info" />
 		<appender-ref ref="PROJECT" />
 	</logger>
-	<logger name="com.meidusa.venus" additivity="false">
-		<level value="info" />
-		<appender-ref ref="PROJECT-CONSOLE" />
-	</logger>
-
-	<logger name="com.meidusa.toolkit.net" additivity="false">
-		<level value="info" />
-		<appender-ref ref="PROJECT-CONSOLE" />
-	</logger>
-
+	
 	<logger name="com.ibatis" additivity="true">
 		<level value="DEBUG" />
 	</logger>

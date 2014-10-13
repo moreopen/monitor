@@ -24,9 +24,9 @@ public class MonitorDataUploaderTest {
 	
 	private String key4LoginMaxTime = "999002000003";
 	
-	private String url = "http://127.0.0.1:9090/monitor/data/upload";
+//	private String url = "http://127.0.0.1:9090/monitor/data/upload";
 	
-//	private String url = "http://192.168.11.102:9090/monitor/data/upload";
+	private String url = "http://192.168.11.102:9090/monitor/data/upload";
 	
 	@Before
 	public void before() throws Exception {
