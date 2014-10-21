@@ -9,6 +9,7 @@
 	
 	<artifactId>monitor-server</artifactId>
 	<name>${project.artifactId} v${project.version}</name>
+	<packaging>war</packaging>
 	
 	<properties>
 		<jetty.version>8.0.0.M2</jetty.version>

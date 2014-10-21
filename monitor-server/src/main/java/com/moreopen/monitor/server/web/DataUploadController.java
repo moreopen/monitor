@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -60,6 +61,10 @@ public class DataUploadController {
 			String[] keyValue = action.split(",");
 			if (keyValue.length != 2) {
 				logger.warn("invalid action, skip and contiune");
+				continue;
+			}
+			if (StringUtils.isBlank(keyValue[0])) {
+				logger.warn("action code can't be blank, skip and continue");
 				continue;
 			}
 			double value = 0d;
