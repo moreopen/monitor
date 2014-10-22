@@ -467,7 +467,7 @@
      			$("#container").highcharts("StockChart",{
       				chart:{
       					zoomType:"x",
-      					margin:30,
+      					margin:40,
       					borderWidth:2,
       					events: {
                              load: function () {
@@ -498,6 +498,7 @@
       			   plotOptions:{
       		            spline:{
       		            	dataGrouping: { enabled: true, approximation: "sum", forced:true, units: [['minute',[5]]]},
+      		            	//dataGrouping: { enabled: true, approximation: "sum", forced:true},
       		            	//dataGrouping: { enabled: false},
       		                /* point:{
       		                    events:{
