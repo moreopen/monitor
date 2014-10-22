@@ -73,7 +73,7 @@ public class DataUploadController {
 			} catch (Exception e) {
 				logger.warn(String.format("invalid monitor value [%s], use default value", keyValue[1]));
 			}
-			MonitorData monitorData = new MonitorData(keyValue[0], value, ip, timestamp);
+			MonitorData monitorData = new MonitorData(keyValue[0].trim(), value, ip, timestamp);
 			list.add(monitorData);
 		}
 		return list;
