@@ -14,12 +14,14 @@
         </layout>
     </appender>
     
-    
+    <logger name="com.moreopen.monitor" additivity="false">
+    	<appender-ref ref="PROJECT"/>
+    </logger>
     <!-- ===================================================================== -->
     <!--  Root loggerµÄ¶¨Òå                                                    -->
     <!-- ===================================================================== -->
     <root>
-        <level value="info"/>
+        <level value="warn"/>
         <appender-ref ref="PROJECT"/>
     </root>
 </log4j:configuration>
