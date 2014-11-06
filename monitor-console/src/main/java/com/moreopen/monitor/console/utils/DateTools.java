@@ -1,10 +1,13 @@
 package com.moreopen.monitor.console.utils;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class DateTools {
 	/**
@@ -23,6 +26,18 @@ public class DateTools {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String s = format.format(date);
 		return s;
+	}
+	
+	public static String simpleDateFormat(Date date) {
+		return new SimpleDateFormat("yyyy-MM-dd").format(date);
+	}
+	
+	public static String monthFormat(Date date) {
+		return new SimpleDateFormat("yyyy-MM").format(date);
+	}
+	
+	public static String abbreviatedDateFormat(Date date) {
+		return new SimpleDateFormat("yyyyMMdd").format(date);
 	}
 
 	/**
@@ -101,6 +116,33 @@ public class DateTools {
 		}
 		return null;
 
+	}
+
+	/**
+	 * 根据月份得到这个月的所有日期
+	 * @param month : yyyy-MM
+	 */
+	public static List<Date> getAllDays(String month) {
+		List<Date> result = new ArrayList<Date>();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date firstDate = null;
+		try {
+			firstDate = dateFormat.parse(month + "-01");
+		} catch (ParseException e) {
+			throw new IllegalArgumentException(e);
+		}
+		result.add(firstDate);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(firstDate);
+		int monthValue = calendar.get(Calendar.MONTH);
+		while (true) {
+			calendar.add(Calendar.DAY_OF_MONTH, 1);
+			if (calendar.get(Calendar.MONTH) != monthValue) {
+				break;
+			}
+			result.add(calendar.getTime());
+		}
+		return result;
 	}
 
 }

@@ -162,21 +162,6 @@ public class DispatchController extends BaseController {
 		return mv;
 	}
 	
-	
-	/**
-	 * 跳到监控详情页
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(value="/monitor/dataEvent/dataEventPage",method = GET)
-	public ModelAndView dataEventPage(){
-		ModelAndView mv=new ModelAndView("/jsp/quxian2");
-
-		return mv;
-	}
-	
-	
 	/**
 	 * 跳到风险事件页面
 	 * @return

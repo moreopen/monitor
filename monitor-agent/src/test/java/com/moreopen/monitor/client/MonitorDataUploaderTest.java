@@ -26,7 +26,7 @@ public class MonitorDataUploaderTest {
 	
 //	private String url = "http://127.0.0.1:9090/monitor/data/upload";
 	
-	private String url = "http://192.168.11.102:9090/monitor/data/upload";
+	private String url = "http://upload.monitor.alonew.com:9090/monitor/data/upload";
 	
 	@Before
 	public void before() throws Exception {
@@ -40,7 +40,7 @@ public class MonitorDataUploaderTest {
 
 	@Test
 	public void test() {
-		for (int i = 0; i < 1000000; i++) {
+		for (int i = 0; i < 10; i++) {
 			monitorDataUploader.setValue(key0, 1 * RandomUtils.nextInt(20), MonitorDataType.INCREMENT);
 			monitorDataUploader.setValue(key1, 2.01 * RandomUtils.nextInt(20), MonitorDataType.AVERAGE);
 			monitorDataUploader.setValue(key2, 3.6 * RandomUtils.nextInt(20), MonitorDataType.MAX);
