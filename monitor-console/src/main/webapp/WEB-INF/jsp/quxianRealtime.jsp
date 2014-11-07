@@ -289,7 +289,7 @@
     				return;
     			}
     			quxianType = thisObj.val();
-    			document.location = "/monitor/dataEvent/perDayPage.htm?menuCode="+$("#menuCode").val()+"&quxianType="+quxianType;
+    			document.location = "/monitor/dataEvent/dailyPage.htm?menuCode="+$("#menuCode").val()+"&quxianType="+quxianType;
  			});
     	}
  		
@@ -644,7 +644,7 @@
 
 <div style="font-size:12px;margin:10px">
 	<input type="radio"  name="quxianTypeRadio" value="fenshi" class="quxianTypeRadio" checked/>分时
-	<input type="radio"  name="quxianTypeRadio" value="perday" class="quxianTypeRadio"/>日统计(按月)
+	<input type="radio"  name="quxianTypeRadio" value="daily" class="quxianTypeRadio"/>日统计(按月)
 </div>
     <table width="100%" style="table-layout:fixed;">
     	<tr>
@@ -661,7 +661,7 @@
 				<div id="devide" style="height=10px"></div>
 				
 			</div>
-			<div title="主机" style="padding:10px" id="ipdiv"> 
+			<div title="主机" style="padding:10px" id="ipdiv">
 				<div><input type="radio" name ="ipradio" class="ipradio" value="" checked/>全部</div>
 				<hr/>
    			</div>

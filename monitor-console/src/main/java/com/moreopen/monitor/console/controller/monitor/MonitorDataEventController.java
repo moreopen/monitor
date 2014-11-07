@@ -88,10 +88,10 @@ public class MonitorDataEventController  extends BaseController {
 	 * @param request
 	 * @param response
 	 */
-	@RequestMapping(value="/monitor/dataEvent/perDayPage")
-	public ModelAndView perDayPage(HttpServletRequest request,HttpServletResponse response) throws IOException {
+	@RequestMapping(value="/monitor/dataEvent/dailyPage")
+	public ModelAndView dailyPage(HttpServletRequest request,HttpServletResponse response) throws IOException {
 		request.setAttribute("menuCode", request.getParameter("menuCode"));
-		return new ModelAndView("/jsp/quxianPerDay");
+		return new ModelAndView("/jsp/quxianDaily");
 	}
 	
 	/**
@@ -99,15 +99,15 @@ public class MonitorDataEventController  extends BaseController {
 	 * @param request
 	 * @param response
 	 */
-	@RequestMapping(value="/monitor/dataEvent/getDataPerDay")
-	public void getDataPerDay(HttpServletRequest request,HttpServletResponse response) throws IOException {
+	@RequestMapping(value="/monitor/dataEvent/getDailyData")
+	public void getDailyData(HttpServletRequest request,HttpServletResponse response) throws IOException {
 		String menuCode = request.getParameter("menuCode");
 		//yyyy-MM
 		String month = request.getParameter("month");
 		if (StringUtils.isBlank(month)) {
 			month = DateTools.monthFormat(new Date());
 		}
-		List<MonitorDataEventPOJO> list = monitorDataEventServiceImpl.getDataPerDayInMonth(month, menuCode);
+		List<MonitorDataEventPOJO> list = monitorDataEventServiceImpl.getDailyDataInMonth(month, menuCode);
 		outputResult2Client(response, JsonUtils.bean2Json(list));
 	}
 	

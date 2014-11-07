@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -18,6 +20,8 @@ import com.moreopen.monitor.console.utils.DateTools;
 /**
  */
 public class MonitorDataEventServiceImpl {
+	
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
 	private JdbcTemplatedBasedMonitorDataDAO monitorDataDAO;
@@ -63,15 +67,29 @@ public class MonitorDataEventServiceImpl {
 	 * @param month 指定的月份:yyyy-MM
 	 * @param menuCode 监控项
 	 */
-	public List<MonitorDataEventPOJO> getDataPerDayInMonth(String month,String menuCode) {
+	public List<MonitorDataEventPOJO> getDailyDataInMonth(String month,String menuCode) {
 		Assert.isTrue(StringUtils.isNotBlank(month));
 		List<Date> dates = DateTools.getAllDays(month);
 		List<Date>[] datesArr = split(dates);
 		List<MonitorDataEventPOJO> result = new ArrayList<MonitorDataEventPOJO>();
 		for (Date date : datesArr[0]) {
-			MonitorDataEventPOJO monitorData = monitorDataDAO.getDataPerDay(menuCode, date);
+			//XXX 直接获取
+			MonitorDataEventPOJO monitorData = monitorDataDAO.getDailyData(menuCode, date);
 			if (monitorData == null) {
-				monitorData = defaultMonitorData(menuCode, date, 0);
+				//根据实时监控表作统计
+				try {
+					monitorData = monitorDataDAO.countDailyData(menuCode, date);
+					if (monitorData == null) {
+						monitorData = defaultMonitorData(menuCode, date, 0);
+					}
+					//XXX 保存以便直接获取
+					monitorDataDAO.saveDailyData(monitorData);
+				} catch (Exception e) {
+					logger.error("error", e);
+					if (monitorData == null) {
+						monitorData = defaultMonitorData(menuCode, date, 0);
+					}
+				}
 			}
 			result.add(monitorData);
 		}

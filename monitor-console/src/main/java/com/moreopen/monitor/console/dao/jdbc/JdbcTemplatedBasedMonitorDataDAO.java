@@ -34,7 +34,11 @@ public class JdbcTemplatedBasedMonitorDataDAO {
 			+ "figure, ipport, event_create_time as event_create_time ";
 	private static final String FROM_CLAUSE = "from monitor_data_event_%s where menu_code = ? ";
 	
-	private static final String QUERY_MONITOR_DATA_PER_DAY = "select sum(figure) as figure, menu_code from monitor_data_event_%s where menu_code = ? group by menu_code";
+	private static final String COUNT_MONITOR_DATA_DAILY = "select sum(figure) as figure, menu_code from monitor_data_event_%s where menu_code = ? group by menu_code";
+
+	private static final String GET_MONITOR_DATA_DAILY = "select * from monitor_data_daily where menu_code = ? and dates = ?";
+
+	private static final String SAVE_DAILY_DATA = "insert into monitor_data_daily(menu_code, figure, dates) values (?, ?, ?)";
 	
 	
 	public List<MonitorDataEventPOJO> findBy(String host, Date startDate, String menuCode) {
@@ -81,26 +85,45 @@ public class JdbcTemplatedBasedMonitorDataDAO {
 		return config;
 	}
 
-	public MonitorDataEventPOJO getDataPerDay(final String menuCode, final Date date) {
-		try {
-			String queryString = QUERY_MONITOR_DATA_PER_DAY;
-			queryString = String.format(queryString, DateTools.abbreviatedDateFormat(date));
-			List<MonitorDataEventPOJO> list = jdbcTemplate.query(queryString, new Object[] {menuCode}, new RowMapper<MonitorDataEventPOJO> () {
-				@Override
-				public MonitorDataEventPOJO mapRow(ResultSet rs, int rowNum) throws SQLException {
-					MonitorDataEventPOJO monitorData = new MonitorDataEventPOJO();
-					monitorData.setFigure(rs.getDouble("figure"));
-					monitorData.setMenuCode(menuCode);
-					monitorData.setDay(DateTools.simpleDateFormat(date));
-					return monitorData;
-				}
-			});
-			return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
-		} catch (Exception e) {
-			logger.error("error:", e);
-			return null;
-		}
-	}	
+	public MonitorDataEventPOJO countDailyData(final String menuCode, final Date date) throws SQLException {
+		
+		String queryString = COUNT_MONITOR_DATA_DAILY;
+		queryString = String.format(queryString, DateTools.abbreviatedDateFormat(date));
+		List<MonitorDataEventPOJO> list = jdbcTemplate.query(queryString, new Object[] {menuCode}, new RowMapper<MonitorDataEventPOJO> () {
+			@Override
+			public MonitorDataEventPOJO mapRow(ResultSet rs, int rowNum) throws SQLException {
+				MonitorDataEventPOJO monitorData = new MonitorDataEventPOJO();
+				monitorData.setFigure(rs.getDouble("figure"));
+				monitorData.setMenuCode(menuCode);
+				monitorData.setDay(DateTools.simpleDateFormat(date));
+				return monitorData;
+			}
+		});
+		return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
+		
+	}
+
+	public MonitorDataEventPOJO getDailyData(final String menuCode, Date date) {
+		final String dates = DateTools.simpleDateFormat(date);
+		List<MonitorDataEventPOJO> list = jdbcTemplate.query(
+				GET_MONITOR_DATA_DAILY, 
+				new Object[] {menuCode, dates}, 
+				new RowMapper<MonitorDataEventPOJO>() {
+			@Override
+			public MonitorDataEventPOJO mapRow(ResultSet rs, int rowNum) throws SQLException {
+				MonitorDataEventPOJO monitorData = new MonitorDataEventPOJO();
+				monitorData.setFigure(rs.getDouble("figure"));
+				monitorData.setMenuCode(menuCode);
+				monitorData.setDay(dates);
+				return monitorData;
+			}
+		});
+		return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
+	}
+
+	public void saveDailyData(MonitorDataEventPOJO monitorData) {
+		jdbcTemplate.update(SAVE_DAILY_DATA, new Object[] {monitorData.getMenuCode(), monitorData.getFigure(), monitorData.getDay()});
+	}
 	
 
 }
