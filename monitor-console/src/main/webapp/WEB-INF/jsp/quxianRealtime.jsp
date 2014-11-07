@@ -236,7 +236,6 @@
     				return;
     			}
     			ip=thisObj.val();
-    			alert(ip);
     			
 	    		//对所有的已经勾选的日期进行数据重加载
 	    		$(".dayCheckbox:checked").each(function(){
