@@ -254,7 +254,7 @@
 	    	</td>
 	    	<td width="150px">
 	    		<div id="month-tabs"  class="easyui-tabs" fit="true" style="width:200px">
-				<div title="日期"> 
+				<div title="月份"> 
 					<input id="monthNum" type="text" style="padding:3px;margin:3px;width:50px" value="7"/>
 					<input type="button"  value="确认" onclick="appendMonth()"/>
 					
