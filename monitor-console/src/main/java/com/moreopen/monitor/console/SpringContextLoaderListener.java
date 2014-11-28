@@ -13,12 +13,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.moreopen.monitor.console.utils.BeanLocator;
 
-/**
- *
- * @author zhengjunwei
- * 
- * @version 1.0.0 2012-02-21
- */
 public class SpringContextLoaderListener extends ContextLoaderListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SpringContextLoaderListener.class);
