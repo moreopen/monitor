@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import com.moreopen.monitor.server.dao.redis.RedisBasedMonitorSourceDao;
 import com.moreopen.monitor.server.domain.MonitorData;
 
 @Component
-public class MonitorDataService {
+public class MonitorDataService implements InitializingBean {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -48,6 +49,11 @@ public class MonitorDataService {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		System.out.println("============== init MonitorDataService");
 	}
 
 }
