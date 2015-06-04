@@ -109,6 +109,20 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 		}
 		throw new IllegalArgumentException("unsupported MonitorDataType : " + monitorDataType);
 	}
+	
+	@Override
+	public void setRatioValue(String key, int value, Ratio ratio) {
+		if (ratio == Ratio.FACTOR) {
+			monitorDataHolder.incrementRatioFactor(key, value);
+			return;
+		} 
+		if (ratio == Ratio.BASE) {
+			monitorDataHolder.incrementRatioBase(key, value);
+			return;
+		}
+		
+		throw new IllegalArgumentException("unsupported ratio : " + ratio);
+	} 
 
 	private void setMaxValue(String key, double doubleValue) {
 		monitorDataHolder.setMax(key, doubleValue);
@@ -125,6 +139,13 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 	//每隔一定的时间上报数据，所以 HttpClient 无需池化
 	@Override
 	public void upload() {
+		List<NameValuePair> paramsList = buildParamsList(monitorDataHolder);
+		doUpload(paramsList);
+		monitorDataHolder.reset();
+	}
+	
+	
+	private void doUpload(List<NameValuePair> params) {
 		HttpClient httpClient = null;
 		HttpPost httpPost = null;
 		try {
@@ -132,9 +153,8 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 			HttpParams httpParams = httpClient.getParams();
 			HttpConnectionParams.setConnectionTimeout(httpParams, HTTP_CONNECTION_TIMEOUT_MILLISECONDS);
 			HttpConnectionParams.setSoTimeout(httpParams, HTTP_SOCKET_TIMEOUT_MILLISECONDS);
-			List<NameValuePair> paramsList = buildParamsList(monitorDataHolder);
 			httpPost = new HttpPost(monitorUrl);
-			HttpEntity httpEntity = new UrlEncodedFormEntity(paramsList, DEFAULT_CHARSET);
+			HttpEntity httpEntity = new UrlEncodedFormEntity(params, DEFAULT_CHARSET);
 			httpPost.setEntity(httpEntity);
 			if (logger.isDebugEnabled()) {
 				try {
@@ -155,13 +175,13 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 		} catch (Exception e) {
 			logger.error("An error occurred while sending data to Monitor Server.", e);
 		} finally {
-			monitorDataHolder.reset();
 			if (httpPost != null) {
 				httpPost.abort();
 				//close connection at once
 				httpClient.getConnectionManager().closeIdleConnections(0, TimeUnit.MILLISECONDS);
 			}
 		}
+	
 	}
 
 	private List<NameValuePair> buildParamsList(MonitorDataHolder monitorDataHolder) {
@@ -184,6 +204,13 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 			params.add(new BasicNameValuePair(ACTION_PARAM_NAME,
 					String.format("%s,%f", entry.getKey(), entry.getValue())));
 		}
+		
+		Map<String, Double> ratioValues = monitorDataHolder.getRatios();
+		for (Entry<String, Double> entry : ratioValues.entrySet()) {
+			params.add(new BasicNameValuePair(ACTION_PARAM_NAME,
+					String.format("%s,%f", entry.getKey(), entry.getValue())));
+		}
+		
 		params.add(new BasicNameValuePair(IP_PARAM_NAME, host));
 		params.add(new BasicNameValuePair(TIMESTAMP_PARA_NAME, System.currentTimeMillis() + ""));
 		return params;
@@ -203,6 +230,17 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 
 	public void setUploadThreads(int uploadThreads) {
 		this.uploadThreads = uploadThreads;
+	}
+
+	@Override
+	public void upload(String key, Number value) {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair(ACTION_PARAM_NAME,
+				String.format("%s,%f", key, value)));
+		params.add(new BasicNameValuePair(IP_PARAM_NAME, host));
+		params.add(new BasicNameValuePair(TIMESTAMP_PARA_NAME, System.currentTimeMillis() + ""));
+		
+		doUpload(params);
 	}
 
 }
