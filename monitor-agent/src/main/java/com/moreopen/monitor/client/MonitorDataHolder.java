@@ -90,7 +90,7 @@ public class MonitorDataHolder {
 	/**
 	 * ratio 统计递增因子
 	 */
-	public void incrementRatioFactor(String key, int value) {
+	public void incrementRatioFactor(String key, int value, boolean incrBase) {
 		KeyValue keyValue = ratioCounters.get(key);
 		if (keyValue == null) {
 			keyValue = new DefaultKeyValue(new AtomicInteger(0), new AtomicInteger(0));
@@ -98,7 +98,9 @@ public class MonitorDataHolder {
 		}
 		synchronized (key.intern()) {
 			((AtomicInteger) keyValue.getKey()).incrementAndGet();
-			((AtomicInteger) keyValue.getValue()).incrementAndGet();
+			if (incrBase) {
+				((AtomicInteger) keyValue.getValue()).incrementAndGet();
+			}
 		}
 	}
 	

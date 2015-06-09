@@ -113,7 +113,7 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 	@Override
 	public void setRatioValue(String key, int value, Ratio ratio) {
 		if (ratio == Ratio.FACTOR) {
-			monitorDataHolder.incrementRatioFactor(key, value);
+			monitorDataHolder.incrementRatioFactor(key, value, true);
 			return;
 		} 
 		if (ratio == Ratio.BASE) {
@@ -123,6 +123,16 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 		
 		throw new IllegalArgumentException("unsupported ratio : " + ratio);
 	} 
+	
+	@Override
+	public void incrRatioFactor(String key, int value, boolean incrBase) {
+		monitorDataHolder.incrementRatioFactor(key, value, incrBase);
+	}
+
+	@Override
+	public void incrRatioBase(String key, int value) {
+		monitorDataHolder.incrementRatioBase(key, value);
+	}
 
 	private void setMaxValue(String key, double doubleValue) {
 		monitorDataHolder.setMax(key, doubleValue);

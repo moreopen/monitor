@@ -9,7 +9,19 @@ public interface MonitorDataUploader {
 	/**
 	 * 递增设置 ratio 监控值
 	 */
+	@Deprecated
 	void setRatioValue(String key, int value, Ratio ratio);
+	
+	/**
+	 * 递增设置 ratio 因子
+	 * @param incrBase 是否同步设置因母
+	 */
+	void incrRatioFactor(String key, int value, boolean incrBase);
+	
+	/**
+	 * 递增设置 ratio 因母
+	 */
+	void incrRatioBase(String key, int value);
 	
 	/**
 	 * 直接上报指定监控项对应的监控值
