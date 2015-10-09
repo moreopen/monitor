@@ -507,8 +507,9 @@
       			    },
       			   plotOptions:{
       		            spline:{
-      		            	//XXX 对于错误率的统计，如果 units 设置过大，会导致 sum 出的结果超过 100% (在 unit 单位内有两个点), 直接设置 units 为 1 minute
-      		            	dataGrouping: { enabled: true, approximation: "sum", forced:true, units: [['minute',[1,3,5]]]},
+      		            	//XXX 对于错误率的统计，如果 units 设置过大，会导致 sum 出的结果超过 100% (在 unit 单位内有两个点), 直接设置 units 为 1 minute, 但会造成曲线过密
+      		            	//dataGrouping: { enabled: true, approximation: "sum", forced:true, units: [['minute',[1,3,5]]]},
+      		            	dataGrouping: { enabled: true, approximation: "sum", forced:true, units: [['minute',[3,5]]]},
       		            	//dataGrouping: { enabled: true, approximation: "sum", forced:true, units: [['minute',[5]]]},
       		            	//dataGrouping: { enabled: true, approximation: "sum", forced:true},
       		            	//dataGrouping: { enabled: false},
