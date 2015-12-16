@@ -13,10 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.moreopen.monitor.console.constant.MonitorConstant;
+import com.moreopen.monitor.console.dao.bean.menu.Alarm;
 import com.moreopen.monitor.console.dao.bean.menu.MenuPOJO;
 import com.moreopen.monitor.console.dao.impl.menu.MenuDAOImpl;
 import com.moreopen.monitor.console.dao.jdbc.JdbcTemplateBasedMenuDAO;
 import com.moreopen.monitor.console.dao.jdbc.JdbcTemplateBasedRoleDAO;
+import com.moreopen.monitor.console.dao.redis.RedisBasedMonitorSourceDao;
 
 public class MenuServiceImpl {
 	
@@ -33,6 +35,9 @@ public class MenuServiceImpl {
 	
 	@Autowired
 	private RoleServiceImpl roleService;
+	
+	@Autowired
+	private RedisBasedMonitorSourceDao monitorSourceDao;
 
 	public List<MenuPOJO> findByMenuPid(int menuPid) {
 		List<MenuPOJO> menuList = menuDAOImpl.findBy(MenuPOJO.class, "menuPid", menuPid);
@@ -84,7 +89,7 @@ public class MenuServiceImpl {
 			menuPOJO.setUpdateUserid(userId);
 			
 			//自动生成唯一的 menu code
-			int childrenSize = parentMenuPOJO.getChildrenSize(); 
+			int childrenSize = parentMenuPOJO.getChildrenSize() == null ? 0 : parentMenuPOJO.getChildrenSize(); 
 			String suffix = StringUtils.leftPad(childrenSize + "", 3, "0");
 			menuPOJO.setMenuCode(parentMenuCode + suffix);
 			
@@ -181,6 +186,27 @@ public class MenuServiceImpl {
 
 	public MenuPOJO findByMenuCode(String menuCode) {
 		return menuDAOImpl.findUniqueBy(MenuPOJO.class, "menuCode", menuCode);
+	}
+
+	public void updateMenuAlarm(MenuPOJO menu, Alarm alarm, Integer userId) {
+		MenuPOJO menuPOJO = new MenuPOJO();
+		menuPOJO.setId(menu.getId());
+		menuPOJO.setUpdateTime(new Date());
+		menuPOJO.setUpdateUserid(userId);
+		menuPOJO.setAlarm(alarm);
+		menuDAOImpl.update(menuPOJO);
+//		XXX 清空 redis 中对应的 menu 数据，Monitor Server 会触发 reload
+		monitorSourceDao.deleteMenu(menu);
+
+	}
+
+	public void delMenuAlarm(MenuPOJO menu, Integer userId) {
+		jdbcTemplateBasedMenuDAO.delAlarm(menu.getId(), userId);
+		if (logger.isDebugEnabled()) {
+			logger.debug(String.format("deleted alarm on menu [%s], operator [%s]", menu.getId(), userId));
+		}
+//		XXX 清空 redis 中对应的 menu 数据，Monitor Server 会触发 reload
+		monitorSourceDao.deleteMenu(menu);
 	}
 
 }

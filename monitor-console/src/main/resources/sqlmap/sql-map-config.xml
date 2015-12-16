@@ -5,7 +5,9 @@
 
 <sqlMapConfig>
 	<settings useStatementNamespaces="true"/>
-	
+
+	<typeHandler javaType="com.moreopen.monitor.console.dao.bean.menu.Alarm" 
+			callback="com.moreopen.monitor.console.dao.impl.AlarmJsonTypeHandlerCallback"/>	
 	<!-- 权限相关 bean 的xml文件 -->
 	<sqlMap resource="sqlmap/MonitorMenu.xml"/>
 	<sqlMap resource="sqlmap/MonitorUser.xml"/>
@@ -20,5 +22,6 @@
 	<!--sqlMap resource="sqlmap/MonitorConfigRuleAlarm.xml"/>
 	<sqlMap resource="sqlmap/MonitorConfigRuleMonitor.xml"/>
 	<sqlMap resource="sqlmap/MonitorConfigRuleUpload.xml"/-->
+   
 	
 </sqlMapConfig>

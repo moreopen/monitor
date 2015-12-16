@@ -2,6 +2,7 @@ package com.moreopen.monitor.console.utils;
 
 import java.util.List;
 
+import com.moreopen.monitor.console.constant.MonitorConstant;
 import com.moreopen.monitor.console.dao.bean.menu.MenuPOJO;
 
 public class Tree {
@@ -56,7 +57,18 @@ public class Tree {
 			if(m.getMenuIsleaf().equals(Integer.valueOf("-1"))){//不是叶子菜单就保持关闭状态
 				strB.append(",\"state\":\"closed\"");//定义状态
 			}
+			
 			strB.append(",");
+			if (m.getMenuIsleaf().equals(MonitorConstant.isLeafMenu)) {
+				strB.append("\"alarm\":\"").append(m.getAlarm() == null ? "N/A" : "已设置").append("\",");
+				if (m.getAlarm() != null) {
+					strB.append("\"alarmValue\":\"").append(m.getAlarm().getAlarmValue() != null ? m.getAlarm().getAlarmValue() : "").append("\",");
+					strB.append("\"alarmValueType\":\"").append(m.getAlarm().getAlarmValueType()).append("\",");
+					strB.append("\"alarmPercent\":\"").append(m.getAlarm().getAlarmPercent() != null ? m.getAlarm().getAlarmPercent() : "").append("\",");
+					strB.append("\"alarmPercentType\":\"").append(m.getAlarm().getAlarmPercentType()).append("\",");
+					strB.append("\"alarmPercentSort\":\"").append(m.getAlarm().getAlarmPercentSort()).append("\",");
+				}
+			}
 			strB.append("\"parentId\":\"").append(m.getMenuPid()).append("\"},");
 		}
 		strB.append("]");

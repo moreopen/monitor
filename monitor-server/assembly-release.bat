@@ -1,1 +1,0 @@
-mvn -U clean assembly:assembly -Prelease -Dmaven.test.skip

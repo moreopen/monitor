@@ -14,7 +14,10 @@ import org.springframework.stereotype.Component;
 
 import com.moreopen.monitor.server.dao.jdbc.JdbcTemplateBasedMonitorDataDao;
 import com.moreopen.monitor.server.dao.redis.RedisBasedMonitorSourceDao;
+import com.moreopen.monitor.server.domain.Alarm;
+import com.moreopen.monitor.server.domain.Menu;
 import com.moreopen.monitor.server.domain.MonitorData;
+import com.moreopen.monitor.server.service.alarm.AlarmService;
 
 @Component
 public class MonitorDataService implements InitializingBean {
@@ -28,6 +31,9 @@ public class MonitorDataService implements InitializingBean {
 	
 	@Resource
 	private RedisBasedMonitorSourceDao monitorSourceDao; 
+	
+	@Resource
+	private AlarmService zxBasedAlarmService;
 
 	/**
 	 * @param monitorDatas 上报的监控数据
@@ -41,6 +47,7 @@ public class MonitorDataService implements InitializingBean {
 					try {
 						monitorDataDao.add(monitorData);
 						monitorSourceDao.update(monitorData.getMonitorCode(), monitorData.getIp());
+						checkAlarm(monitorData);
 					} catch (Exception e) {
 						logger.error(String.format("add MonitorData failed, code [%s], value [%f], ip [%s]", 
 								monitorData.getMonitorCode(), monitorData.getValue(), monitorData.getIp()), e
@@ -49,6 +56,76 @@ public class MonitorDataService implements InitializingBean {
 				}
 			}
 		});
+	}
+
+	//XXX 注意，此检查是针对单个应用服务器的监控数据检查，并没有汇总检查（所以设置监控值的时候需要考虑此因素，理论上认为每个服务器的上报的监控值都比较接近）
+	protected void checkAlarm(MonitorData monitorData) {
+		boolean doAlarm = false;
+		boolean saveMenu = false;
+		Menu menu = null;
+		try {
+			String monitorCode = monitorData.getMonitorCode();
+			menu = monitorSourceDao.getMenu(monitorCode);
+			if (menu == null) {
+				menu = monitorDataDao.getMenu(monitorCode);
+				if (menu == null) {
+					logger.warn(String.format("can't find monitor menu by code [%s]", monitorCode));
+					return;
+				} else {
+					if (logger.isInfoEnabled()) {
+						logger.info(String.format("loaded menu [%s] from db", monitorCode));
+					}
+					saveMenu = true;
+				}
+			}
+			Alarm alarm = menu.getAlarm();
+			if (alarm == null) {
+				return;
+			}
+			
+			if (alarm.getAlarmValue() != null) {
+				if ("lt".equals(alarm.getAlarmValueType())) {
+					doAlarm =  monitorData.getValue() < alarm.getAlarmValue();
+				} else {
+					doAlarm = monitorData.getValue() > alarm.getAlarmValue();
+				}
+			}
+			//如果已经触发报警，则忽略百分比报警设置
+			if (!doAlarm && alarm.getAlarmPercent() != null) {
+				Double lastData = menu.getLastData(monitorData.getIp());
+				if (lastData != null) {//已经设置过值，则比较百分比
+					if ("desc".equals(alarm.getAlarmPercentSort())) {
+						if (monitorData.getValue() < lastData) {
+							doAlarm = "lt".equals(alarm.getAlarmPercentType()) 
+									? (lastData - monitorData.getValue()) / lastData * 100 < alarm.getAlarmPercent() 
+											: (lastData - monitorData.getValue()) / lastData * 100 > alarm.getAlarmPercent(); 
+						}
+					} else {
+						if (monitorData.getValue() > lastData) {
+							doAlarm = "lt".equals(alarm.getAlarmPercentType()) 
+									? (monitorData.getValue() - lastData) / lastData * 100 < alarm.getAlarmPercent() 
+											: (monitorData.getValue() - lastData) / lastData * 100 > alarm.getAlarmPercent();
+						}
+					}
+				}
+			}
+			if (alarm.getAlarmPercent() != null) {
+				//set last data
+				menu.setLastData(monitorData.getIp(), monitorData.getValue());
+				saveMenu = true;
+			}
+			if (doAlarm) {
+				//发送报警
+				zxBasedAlarmService.alarm(menu, monitorData);
+			}
+		} catch (Exception e) {
+			logger.error("exception : ", e);
+			
+		} finally {
+			if (saveMenu && menu != null) {
+				monitorSourceDao.saveMenu(menu);
+			}
+		}
 	}
 
 	@Override

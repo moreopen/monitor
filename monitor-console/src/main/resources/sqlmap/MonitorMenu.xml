@@ -19,6 +19,7 @@
 		<result column="CHILDREN_SIZE" jdbcType="Integer" property="childrenSize"/>
 		
 		<result column="id" jdbcType="Integer" property="id"/>
+		<result column="alarm" jdbcType="VARCHAR" javaType="com.moreopen.monitor.console.dao.bean.menu.Alarm" property="alarm"/>
 
 	</resultMap>
 	
@@ -42,7 +43,8 @@
 			date_format(m.CREATE_TIME,'%Y-%m-%d %T') as createTimeFormat,
 			date_format(m.UPDATE_TIME,'%Y-%m-%d %T') as updateTimeFormat,
 			m.MENU_CODE as MENU_CODE,
-			m.CHILDREN_SIZE as CHILDREN_SIZE
+			m.CHILDREN_SIZE as CHILDREN_SIZE,
+			m.alarm as alarm
 		FROM monitor_menu AS m
 		LEFT JOIN monitor_user
 		ON m.CREATE_USERID=monitor_user.user_id
@@ -69,8 +71,8 @@
 	
 	<!-- 增加菜单 -->
 	<insert id="insertMenu" parameterClass="menuPOJO">
-		insert monitor_menu(MENU_NAME,MENU_POSITION,MENU_FLOOR,MENU_ISLEAF,MENU_PID,CREATE_USERID,CREATE_TIME,UPDATE_USERID,UPDATE_TIME,MENU_CODE,CHILDREN_SIZE)
-		values(#id#,#menuName#,#menuPosition#,#menuFloor#,#menuIsleaf#,#menuPid#,#createUserid#,#createTime#,#updateUserid#,#updateTime#,#menuCode#,#childrenSize#)
+		insert monitor_menu(MENU_NAME,MENU_POSITION,MENU_FLOOR,MENU_ISLEAF,MENU_PID,CREATE_USERID,CREATE_TIME,UPDATE_USERID,UPDATE_TIME,MENU_CODE,CHILDREN_SIZE,alarm)
+		values(#id#,#menuName#,#menuPosition#,#menuFloor#,#menuIsleaf#,#menuPid#,#createUserid#,#createTime#,#updateUserid#,#updateTime#,#menuCode#,#childrenSize#,#alarm#)
 		<!-- 
 			<selectKey resultClass="int" keyProperty="menuId">
 				SELECT LAST_INSERT_ID()
@@ -86,7 +88,8 @@
 	<!-- 通过menu_id去查询-->
 	<select id="selectByMenuId" parameterClass="java.lang.Integer" resultClass="menuPOJO">
 		SELECT id as id,MENU_NAME as menuName,MENU_POSITION as menuPosition,MENU_FLOOR as menuFloor,MENU_ISLEAF as menuIsleaf,MENU_PID as menuPid
-			,CREATE_USERID as createUserid,CREATE_TIME as createTime,UPDATE_USERID as updateUserid,UPDATE_TIME as updateTime,STATUS as status,MENU_CODE as menuCode,CHILDREN_SIZE as childrenSize 
+			,CREATE_USERID as createUserid,CREATE_TIME as createTime,UPDATE_USERID as updateUserid,UPDATE_TIME as updateTime
+			,STATUS as status,MENU_CODE as menuCode,CHILDREN_SIZE as childrenSize,alarm as alarm 
 		FROM monitor_menu
 		WHERE id=#id#
 	</select>
@@ -119,6 +122,9 @@
 				</isNotNull>
 				<isNotNull  prepend="," property="childrenSize">
 					CHILDREN_SIZE=#childrenSize#
+				</isNotNull>
+				<isNotNull  prepend="," property="alarm">
+					alarm=#alarm#
 				</isNotNull>
 			</dynamic>
 		where id=#id#

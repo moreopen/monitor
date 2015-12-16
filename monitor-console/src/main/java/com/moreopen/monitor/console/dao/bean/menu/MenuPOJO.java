@@ -27,12 +27,14 @@ public class MenuPOJO implements Serializable {
 	 * 下级子菜单的数量。XXX 为了保证 menuCode 的唯一性，当删除子菜单时，不会改变父菜单 childrenSize 的值，只有父菜单变为叶子节点时才会重置 childrenSize 为 0.
 	 * 所以 childrenSize 并不是此菜单最真实的子菜单数量，只是用来生成子菜单 menuCode 的一个计数器而已
 	 */
-	private int childrenSize;
+	private Integer childrenSize;
 	
 	private String updateTimeFormat;//更新时间格式化
 	private String createTimeFormat;//创建时间格式化
 	private String createUserName;//创建者名字
 	private String updateUserName;//更新人的名字
+	
+	private Alarm alarm;
 	
 	public String getUpdateTimeFormat() {
 		return updateTimeFormat;
@@ -163,11 +165,11 @@ public class MenuPOJO implements Serializable {
 		this.menuCode = menuCode;
 	}
 
-	public int getChildrenSize() {
+	public Integer getChildrenSize() {
 		return childrenSize;
 	}
 
-	public void setChildrenSize(int childrenSize) {
+	public void setChildrenSize(Integer childrenSize) {
 		this.childrenSize = childrenSize;
 	}
 
@@ -177,6 +179,14 @@ public class MenuPOJO implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Alarm getAlarm() {
+		return alarm;
+	}
+
+	public void setAlarm(Alarm alarm) {
+		this.alarm = alarm;
 	}
 
 }

@@ -23,5 +23,10 @@
 		<property name="maxPoolSize" value="20" />
 		<property name="queueCapacity" value="1000" />
 	</bean>
+	
+	<bean id="alarmService" class="com.moreopen.monitor.server.service.alarm.ZXBasedAlarmService">
+		<property name="zxPushUrl" value="${zx.push.url}"/>
+		<property name="messageAlarmTemplate" value="${message.alarm.template}"/>
+	</bean>
 
 </beans>

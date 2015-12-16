@@ -2,6 +2,7 @@ package com.moreopen.monitor.console.dao.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class JdbcTemplateBasedMenuDAO {
 	private static final String QUERY_SECOND_MENUS = "select id, menu_code, menu_name from monitor_menu where menu_pid = 1 and status = ? limit ?, ?";
 	
 	private static final String COUNT_SECOND_MENU = "select count(id) from monitor_menu where menu_pid = 1 and status = ?";
+
+	private static final String DEL_ALARM = "update monitor_menu set alarm = null, update_userId = ?, update_time = ? where id = ?";
 	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -37,7 +40,7 @@ public class JdbcTemplateBasedMenuDAO {
 				menuPOJO.getMenuIsleaf(), menuPOJO.getMenuPid(), 
 				menuPOJO.getCreateUserid(), menuPOJO.getCreateTime(), 
 				menuPOJO.getUpdateUserid(), menuPOJO.getUpdateTime(), 
-				menuPOJO.getMenuCode(), menuPOJO.getChildrenSize()
+				menuPOJO.getMenuCode(), menuPOJO.getChildrenSize() == null ? 0 : menuPOJO.getChildrenSize() 
 			}
 		);
 	}
@@ -63,6 +66,10 @@ public class JdbcTemplateBasedMenuDAO {
 
 	public Integer getSecondMenuCount(Integer status) {
 		return this.jdbcTemplate.queryForInt(COUNT_SECOND_MENU, new Object[] {status});
+	}
+
+	public void delAlarm(int menuId, Integer userId) {
+		this.jdbcTemplate.update(DEL_ALARM, new Object[] {userId, new Date(), menuId});
 	}
 
 }

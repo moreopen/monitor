@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
@@ -22,6 +23,7 @@ import com.moreopen.monitor.console.biz.menu.MenuServiceImpl;
 import com.moreopen.monitor.console.biz.menu.RoleServiceImpl;
 import com.moreopen.monitor.console.constant.MonitorConstant;
 import com.moreopen.monitor.console.controller.BaseController;
+import com.moreopen.monitor.console.dao.bean.menu.Alarm;
 import com.moreopen.monitor.console.dao.bean.menu.MenuPOJO;
 import com.moreopen.monitor.console.dao.bean.menu.RoleResourcePOJO;
 import com.moreopen.monitor.console.dao.bean.menu.UserRolePOJO;
@@ -242,6 +244,54 @@ public class MenuController extends BaseController {
 		
 		outputResult2Client(response, dataJSON);
 		
+	}
+	
+	@RequestMapping(value="/monitor/menu/saveMenuAlarm.htm")
+	public void saveMenuAlarm(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		HttpSession session = request.getSession();
+		String menuId = request.getParameter("id");
+		Long alarmValue = StringUtils.isNotBlank(request.getParameter("alarmValue")) ? Long.valueOf(request.getParameter("alarmValue")) : null;
+		String alarmValueType = request.getParameter("alarmValueType");
+		Double alarmPercent = StringUtils.isNotBlank(request.getParameter("alarmPercent")) ? Double.valueOf(request.getParameter("alarmPercent")) : null;
+		String alarmPercentType = request.getParameter("alarmPercentType");
+		String alarmPercentSort = request.getParameter("alarmPercentSort");
+		
+		Integer userId = Integer.valueOf(SessionContextUtils.getUser(session).getUserId());
+		
+		//check
+		MenuPOJO menu = menuServiceImpl.findByMenuId(Integer.parseInt(menuId));
+		if (menu == null) {
+			outputResult2Client(response, MonitorConstant.successMsg);
+			return;
+		}
+		//XXX 不能在父菜单上设置报警
+		if (menu.getMenuIsleaf() != null && menu.getMenuIsleaf().equals(MonitorConstant.isNotLeafMenu)) {
+			outputResult2Client(response, MonitorConstant.failedMsg);
+			return;
+		}
+
+		menuServiceImpl.updateMenuAlarm(menu, new Alarm(alarmValue, alarmValueType, alarmPercent, alarmPercentType, alarmPercentSort), userId);
+		outputResult2Client(response, MonitorConstant.successMsg);
+
+	}
+	
+	@RequestMapping(value="/monitor/menu/delMenuAlarm.htm")
+	public void delMenuAlarm(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		HttpSession session = request.getSession();
+		String menuId = request.getParameter("id");
+		
+		Integer userId = Integer.valueOf(SessionContextUtils.getUser(session).getUserId());
+		
+		//check
+		MenuPOJO menu = menuServiceImpl.findByMenuId(Integer.parseInt(menuId));
+		if (menu == null) {
+			outputResult2Client(response, MonitorConstant.successMsg);
+			return;
+		}
+
+		menuServiceImpl.delMenuAlarm(menu, userId);
+		outputResult2Client(response, MonitorConstant.successMsg);
+
 	}
 
 }

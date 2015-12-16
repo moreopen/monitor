@@ -11,9 +11,10 @@ import org.springframework.core.task.TaskExecutor;
 import com.moreopen.monitor.server.exception.ServiceException;
 
 /**
- * 报警
+ * 报警 
  *
  */
+@Deprecated
 public class AlarmWayServiceImpl {
 	
 	@Autowired
