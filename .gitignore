@@ -3,4 +3,9 @@ logs/
 .settings
 .classpath
 .project
-**/monitor.properties
+.DS_Store
+*/.DS_Store
+
+monitor-console/profile/dev/monitor.properties
+monitor-console/profile/*/*.properties
+monitor-server/profile/*/*.properties
