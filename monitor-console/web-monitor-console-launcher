@@ -15,7 +15,7 @@ then
 	sleep 2
 fi
 
-JMX_OPTS="-Dcom.sun.management.jmxremote.port=$APP_JMX_PORT -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
+#JMX_OPTS="-Dcom.sun.management.jmxremote.port=$APP_JMX_PORT -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
 
 JAVA_OPTS="-server -Xms$MMS -Xmx$MMX -XX:PermSize=64m -XX:MaxPermSize=128m"
 JAVA_OPTS="$JAVA_OPTS -XX:+UseParallelGC -XX:+UseParallelOldGC -XX:ParallelGCThreads=8"
