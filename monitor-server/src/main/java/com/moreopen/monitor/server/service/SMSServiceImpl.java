@@ -1,4 +1,4 @@
-package com.moreopen.monitor.server.service.alarm;
+package com.moreopen.monitor.server.service;
 
 import static com.moreopen.monitor.server.constant.MonitorConstant.charSet;
 import static com.moreopen.monitor.server.constant.MonitorErrorConstant.ALARM_SENDSMS_ERROR;

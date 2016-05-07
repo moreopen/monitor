@@ -32,8 +32,8 @@ public class MonitorDataService implements InitializingBean {
 	@Resource
 	private RedisBasedMonitorSourceDao monitorSourceDao; 
 	
-	@Resource
-	private AlarmService zxBasedAlarmService;
+	@Resource(name = "alarmServiceChain")
+	private AlarmService alarmServiceChain;
 
 	/**
 	 * @param monitorDatas 上报的监控数据
@@ -116,7 +116,7 @@ public class MonitorDataService implements InitializingBean {
 			}
 			if (doAlarm) {
 				//发送报警
-				zxBasedAlarmService.alarm(menu, monitorData);
+				alarmServiceChain.alarm(menu, monitorData);
 			}
 		} catch (Exception e) {
 			logger.error("exception : ", e);

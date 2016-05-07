@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -150,6 +151,9 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 	@Override
 	public void upload() {
 		List<NameValuePair> paramsList = buildParamsList(monitorDataHolder);
+		if (CollectionUtils.isEmpty(paramsList)) {
+			return;
+		}
 		doUpload(paramsList);
 		monitorDataHolder.reset();
 	}
@@ -221,6 +225,10 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 					String.format("%s,%f", entry.getKey(), entry.getValue())));
 		}
 		
+		if (CollectionUtils.isEmpty(params)) {
+			return null;
+		}
+		
 		params.add(new BasicNameValuePair(IP_PARAM_NAME, host));
 		params.add(new BasicNameValuePair(TIMESTAMP_PARA_NAME, System.currentTimeMillis() + ""));
 		return params;
@@ -247,6 +255,17 @@ public class DefaultMonitorDataUploader implements MonitorDataUploader, Initiali
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair(ACTION_PARAM_NAME,
 				String.format("%s,%f", key, value)));
+		params.add(new BasicNameValuePair(IP_PARAM_NAME, host));
+		params.add(new BasicNameValuePair(TIMESTAMP_PARA_NAME, System.currentTimeMillis() + ""));
+		
+		doUpload(params);
+	}
+	
+	@Override
+	public void upload(String key, long value, String host) {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair(ACTION_PARAM_NAME,
+				String.format("%s,%d", key, value)));
 		params.add(new BasicNameValuePair(IP_PARAM_NAME, host));
 		params.add(new BasicNameValuePair(TIMESTAMP_PARA_NAME, System.currentTimeMillis() + ""));
 		

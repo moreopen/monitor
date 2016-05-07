@@ -28,5 +28,11 @@ public interface MonitorDataUploader {
 	 * 频率由应用方决定，此方法只负责上报数据
 	 */
 	void upload(String key, Number value);
+	
+	/**
+	 * 直接上报指定监控项对应的监控值
+	 * 频率由应用方决定，此方法只负责上报数据
+	 */
+	void upload(String key, long value, String host);
 
 }

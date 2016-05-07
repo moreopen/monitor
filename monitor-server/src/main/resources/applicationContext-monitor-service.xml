@@ -24,9 +24,29 @@
 		<property name="queueCapacity" value="1000" />
 	</bean>
 	
-	<bean id="alarmService" class="com.moreopen.monitor.server.service.alarm.ZXBasedAlarmService">
+	<bean id="zxAlarmService" class="com.moreopen.monitor.server.service.alarm.ZXBasedAlarmService">
 		<property name="zxPushUrl" value="${zx.push.url}"/>
 		<property name="messageAlarmTemplate" value="${message.alarm.template}"/>
+	</bean>
+	
+	<bean id="emailAlarmService" class="com.moreopen.monitor.server.service.alarm.EmailAlarmService">
+		<property name="tos" value="${alarm.mail.tos}"/>
+		<property name="mailService" ref="mailService"/>
+	</bean>
+	
+	<bean id="mailService" class="com.moreopen.monitor.server.service.MailService">
+		<property name="mailSender" value="${mail.sender.name}"/>
+		<property name="mailSenderPass" value="${mail.sender.pass}"/>
+		<property name="mailSenderServer" value="${mail.sender.server}"/>
+	</bean>
+	
+	<bean id="alarmServiceChain" class="com.moreopen.monitor.server.service.alarm.AlarmServiceChain">
+		<property name="list">
+			<list>
+				<ref bean="emailAlarmService"/>
+				<ref bean="zxAlarmService"/>
+			</list>
+		</property>
 	</bean>
 
 </beans>
